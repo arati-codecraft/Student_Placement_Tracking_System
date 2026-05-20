@@ -1,0 +1,101 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        AdminDao dao = new AdminDaoImpl();
+
+        List<Placement> list = dao.getAllPlacements();
+
+        int students = dao.totalStudents();
+        int companies = dao.totalCompanies();
+        int applications = dao.totalApplications();
+        int selected = dao.totalSelected();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head>");
+        out.println("<title>Admin Dashboard</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+
+        out.println("<style>");
+        out.println(".card-box{padding:20px;background:white;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1)}");
+        out.println("</style>");
+
+        out.println("</head><body class='bg-light'>");
+
+        out.println("<div class='container mt-4'>");
+        out.println("<h2>Admin Dashboard</h2>");
+
+        // ===== STATS =====
+        out.println("<div class='row mt-3'>");
+
+        out.println(statCard("Students", students, "primary"));
+        out.println(statCard("Companies", companies, "success"));
+        out.println(statCard("Applications", applications, "warning"));
+        out.println(statCard("Selected", selected, "info"));
+
+        out.println("</div>");
+
+        // ===== TABLE =====
+        out.println("<div class='card mt-4 p-3'>");
+        out.println("<h5>Placement Details</h5>");
+
+        out.println("<table class='table table-bordered mt-2'>");
+        out.println("<tr>");
+        out.println("<th>Student</th>");
+        out.println("<th>Company</th>");
+        out.println("<th>Package</th>");
+        out.println("<th>Status</th>");
+        out.println("</tr>");
+
+        for (Placement p : list) {
+
+            out.println("<tr>");
+            out.println("<td>" + p.getStudentName() + "</td>");
+            out.println("<td>" + p.getCompanyName() + "</td>");
+            out.println("<td>" + p.getPackageName() + "</td>");
+            out.println("<td>" + p.getStatus() + "</td>");
+            out.println("</tr>");
+        }
+
+        out.println("</table>");
+        out.println("</div>");
+
+        out.println("</div>");
+        out.println("</body></html>");
+    }
+
+    private String statCard(String title, int value, String color) {
+
+        return "<div class='col-md-3'>"
+                + "<div class='card-box'>"
+                + "<h6>" + title + "</h6>"
+                + "<h3 class='text-" + color + "'>" + value + "</h3>"
+                + "</div>"
+                + "</div>";
+    }
+
+
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+}

@@ -1,0 +1,26 @@
+package org.placepro.serviceImpl;
+
+import java.util.List;
+import org.placepro.model.Users;
+import org.placepro.repository.StudentRepository;
+import org.placepro.repositoryImpl.StudentRepositoryImpl;
+import org.placepro.service.StudentService;
+
+public class StudentServiceImpl implements StudentService {
+    private StudentRepository repo = new StudentRepositoryImpl();
+
+    @Override
+    public void addStudent(Users student) {
+        repo.save(student);
+    }
+
+    @Override
+    public void deleteStudent(int id) {
+        repo.delete(id);
+    }
+
+    @Override
+    public List<Users> getAllStudents() {
+        return repo.findAllStudents();
+    }
+}

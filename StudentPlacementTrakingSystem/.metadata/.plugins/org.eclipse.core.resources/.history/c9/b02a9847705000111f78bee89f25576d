@@ -1,0 +1,65 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+/**
+ * Servlet implementation class NotificationServlet
+ */
+@WebServlet("/notifications")
+public class NotificationsServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("<h2>Your Notifications</h2><ul>");
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "SELECT message, created_at FROM notifications WHERE student_id=? ORDER BY created_at DESC"
+             )) {
+            ps.setInt(1, u.getId());
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                out.println("<li>" + rs.getTimestamp("created_at") + " - " + rs.getString("message") + "</li>");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        out.println("</ul>");
+    }
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

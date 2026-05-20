@@ -1,0 +1,58 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Application;
+
+public class ApplicationRepositoryImpl {
+
+    public boolean save(Application app){
+
+        try{
+
+            Connection con =
+                    DBConnection.getConnection();
+
+            // CHECK COMPANY EXISTS
+            PreparedStatement check =
+                    con.prepareStatement(
+                            "SELECT id FROM companies WHERE id=?");
+
+            check.setInt(1, app.getCompanyId());
+
+            ResultSet rs = check.executeQuery();
+
+            if(!rs.next()){
+
+                System.out.println(
+                        "Invalid Company ID");
+
+                return false;
+            }
+
+            // INSERT APPLICATION
+            PreparedStatement ps =
+                    con.prepareStatement(
+                    "INSERT INTO placements(student_id, company_id, status, apply_date) VALUES(?,?,?,NOW())");
+
+            ps.setInt(1, app.getStudentId());
+
+            ps.setInt(2, app.getCompanyId());
+
+            ps.setString(3, app.getStatus());
+
+            int i = ps.executeUpdate();
+
+            return i > 0;
+
+        }catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+}

@@ -1,0 +1,6 @@
+package org.placepro.dao;
+
+public interface PlacementDao
+{
+
+}

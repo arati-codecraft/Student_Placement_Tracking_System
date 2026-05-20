@@ -1,0 +1,13 @@
+package org.placepro.repository;
+
+import java.util.List;
+
+import org.placepro.model.Application;
+
+public interface ApplicationRepository {
+    boolean save(Application app);   // ✅ single insert method
+    List<Application> findByStudentId(int studentId);
+    List<Application> findAll();
+    void updateStatus(int id, String status);
+    void delete(int id);
+}

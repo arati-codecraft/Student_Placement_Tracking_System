@@ -1,0 +1,25 @@
+package org.placepro.daoImpl;
+
+import java.util.List;
+import org.placepro.dao.UsersDao;
+import org.placepro.model.Users;
+import org.placepro.repository.UsersRepository;
+import org.placepro.repositoryImpl.UsersRepositoryImpl;
+
+public class UsersDaoImpl implements UsersDao {
+    private UsersRepository repo = new UsersRepositoryImpl();
+
+    @Override public void addUser(Users u) { repo.save(u); }
+    @Override public void updateUser(Users u) { repo.update(u); }
+    @Override public void deleteUser(int id) { repo.delete(id); }
+    @Override public Users getUserById(int id) { return repo.findById(id); }
+    @Override public List<Users> getAllUsers() { return repo.findAll(); }
+    @Override public List<Users> searchUsers(String course, Double percentage, String skill) { return repo.search(course, percentage, skill); }
+    @Override public void updateUserStatus(int id, String status) { repo.updateStatus(id, status); }
+    @Override
+    public List<Users> getAllStudents() {
+        // Assuming your repository has a method findAllStudents()
+        return repo.findAllStudents();
+    }
+
+}

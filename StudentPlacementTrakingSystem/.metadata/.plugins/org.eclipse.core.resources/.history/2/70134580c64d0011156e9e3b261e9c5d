@@ -1,0 +1,76 @@
+package org.placepro.daoImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.model.Users;
+
+public class UsersLoginDaoImpl implements UsersLoginDao {
+
+    @Override
+    public boolean registerUser(Users user) {
+
+        boolean status = false;
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO users(name,email,mobile,course,percentage,skills,password,role) VALUES(?,?,?,?,?,?,?,?)"
+            );
+
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getEmail());
+            ps.setString(3, user.getMobile());
+            ps.setString(4, user.getCourse());
+            ps.setDouble(5, user.getPercentage());
+            ps.setString(6, user.getSkills());
+            ps.setString(7, user.getPassword());
+            ps.setString(8, "Student");
+
+            int i = ps.executeUpdate();
+            if (i > 0) status = true;
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+
+    @Override
+    public Users validateLogin(String email, String password) {
+
+        Users user = null;
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM users WHERE email=? AND password=?"
+            );
+
+            ps.setString(1, email);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                user = new Users();
+
+                user.setId(rs.getInt("id"));
+                user.setName(rs.getString("name"));
+                user.setEmail(rs.getString("email"));
+                user.setRole(rs.getString("role"));
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return user;
+    }
+}

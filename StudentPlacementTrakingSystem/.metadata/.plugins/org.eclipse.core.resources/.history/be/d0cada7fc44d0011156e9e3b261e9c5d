@@ -1,0 +1,50 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/studentlogin")
+public class UsersLoginServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+
+        UsersLoginDao dao = new UsersLoginDaoImpl();
+
+        // ✅ FIX: return Users object (not boolean)
+        Users user = dao.validateLogin(email, password);
+
+        if (user != null) {
+
+            HttpSession session = request.getSession();
+            session.setAttribute("user", user);
+
+            // ✅ ROLE BASED REDIRECT
+            if ("Admin".equalsIgnoreCase(user.getRole())) {
+                response.sendRedirect("Admin/AdminDashboard.html");
+            } else {
+                response.sendRedirect("Student/StudentDashboard.html");
+            }
+
+        } else {
+            response.sendRedirect("login.html?error=Invalid");
+        }
+    }
+
+    // ✅ FIX: correct doGet
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.sendRedirect("login.html");
+    }
+}

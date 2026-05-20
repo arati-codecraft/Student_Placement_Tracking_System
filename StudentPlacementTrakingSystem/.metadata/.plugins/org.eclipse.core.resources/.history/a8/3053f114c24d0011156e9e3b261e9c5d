@@ -1,0 +1,61 @@
+package org.placepro.daoImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.model.Users;
+ 
+public class UsersLoginDaoImpl implements UsersLoginDao {
+
+    @Override
+    public boolean registerStudent(Users student) {
+        boolean status = false;
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO students(name,email,mobile,course,percentage,skills,password) VALUES(?,?,?,?,?,?,?)"
+            );
+            ps.setString(1, student.getName());
+            ps.setString(2, student.getEmail());
+            ps.setString(3, student.getMobile());
+            ps.setString(4, student.getCourse());
+            ps.setDouble(5, student.getPercentage());
+            ps.setString(6, student.getSkills());
+            ps.setString(7, student.getPassword());
+
+            int i = ps.executeUpdate();
+            if (i > 0) status = true;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return status;
+    }
+
+    @Override
+    public boolean validateLogin(String email, String password) {
+        boolean status = false;
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM students WHERE email=? AND password=?"
+            );
+            ps.setString(1, email);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                status = true;
+            }
+            else
+            {
+            	return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return status;
+    }
+}

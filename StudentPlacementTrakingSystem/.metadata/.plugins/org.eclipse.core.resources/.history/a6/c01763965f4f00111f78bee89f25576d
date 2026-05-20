@@ -1,0 +1,128 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    private AdminDao adminDao = new AdminDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        // ✅ SESSION CHECK (IMPORTANT)
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("role") == null) {
+            resp.sendRedirect("login.html");
+            return;
+        }
+
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        int students = adminDao.totalStudents();
+        int companies = adminDao.totalCompanies();
+        int applications = adminDao.totalApplications();
+        int selected = adminDao.totalSelected();
+
+        List<Placement> apps = adminDao.getAllPlacements();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head><title>Admin Dashboard</title>");
+
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+
+        out.println("<style>");
+        out.println(".badge-applied { background:orange; }");
+        out.println(".badge-selected { background:green; }");
+        out.println(".badge-rejected { background:red; }");
+        out.println("</style>");
+
+        out.println("</head><body>");
+
+        out.println("<div class='container mt-4'>");
+
+        out.println("<div class='d-flex justify-content-between'>");
+        out.println("<h2>Admin Dashboard</h2>");
+        out.println("<a href='logout' class='btn btn-danger'>Logout</a>");
+        out.println("</div>");
+
+        out.println("<p>Welcome, Admin 👋</p>");
+
+        // ✅ STATS
+        out.println("<div class='row mb-4'>");
+        out.println("<div class='col-md-3'><div class='card shadow'><div class='card-body'>Total Students: <b>" + students + "</b></div></div></div>");
+        out.println("<div class='col-md-3'><div class='card shadow'><div class='card-body'>Total Companies: <b>" + companies + "</b></div></div></div>");
+        out.println("<div class='col-md-3'><div class='card shadow'><div class='card-body'>Applications: <b>" + applications + "</b></div></div></div>");
+        out.println("<div class='col-md-3'><div class='card shadow'><div class='card-body'>Selected Students: <b>" + selected + "</b></div></div></div>");
+        out.println("</div>");
+
+        // ✅ TABLE
+        out.println("<h4>Placement Applications</h4>");
+        out.println("<table class='table table-hover table-bordered'>");
+
+        out.println("<thead class='table-dark'><tr>");
+        out.println("<th>ID</th><th>Name</th><th>Email</th><th>Course</th><th>Education</th><th>Company</th><th>Package</th><th>Status</th><th>Action</th>");
+        out.println("</tr></thead>");
+
+        out.println("<tbody>");
+
+        if (apps != null) {
+            for (Placement p : apps) {
+
+                String badgeClass = "badge-applied";
+
+                if ("Selected".equalsIgnoreCase(p.getStatus()))
+                    badgeClass = "badge-selected";
+                else if ("Rejected".equalsIgnoreCase(p.getStatus()))
+                    badgeClass = "badge-rejected";
+
+                out.println("<tr>");
+
+                out.println("<td>" + p.getId() + "</td>");
+                out.println("<td>" + (p.getStudentName() != null ? p.getStudentName() : "-") + "</td>");
+                out.println("<td>" + (p.getEmail() != null ? p.getEmail() : "-") + "</td>");
+                out.println("<td>" + (p.getCourse() != null ? p.getCourse() : "-") + "</td>");
+                out.println("<td>" + (p.getEducation() != null ? p.getEducation() : "-") + "</td>");
+                out.println("<td>" + (p.getCompanyName() != null ? p.getCompanyName() : "-") + "</td>");
+                out.println("<td>" + p.getPackageAmount() + "</td>");
+
+                out.println("<td><span class='badge " + badgeClass + "'>" + p.getStatus() + "</span></td>");
+
+                // ✅ ACTION BUTTONS (NEW)
+                out.println("<td>");
+
+                if (!"Selected".equalsIgnoreCase(p.getStatus())) {
+                    out.println("<a href='updateStatus?id=" + p.getId() + "&status=Selected' class='btn btn-success btn-sm'>Select</a> ");
+                }
+
+                if (!"Rejected".equalsIgnoreCase(p.getStatus())) {
+                    out.println("<a href='updateStatus?id=" + p.getId() + "&status=Rejected' class='btn btn-danger btn-sm'>Reject</a>");
+                }
+
+                out.println("</td>");
+
+                out.println("</tr>");
+            }
+        }
+
+        out.println("</tbody></table>");
+
+        out.println("</div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+}

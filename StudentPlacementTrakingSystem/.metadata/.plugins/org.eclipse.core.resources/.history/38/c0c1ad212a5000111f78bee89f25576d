@@ -1,0 +1,54 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Company;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/updateCompanyForm")
+public class UpdateCompanyFormServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        int id = Integer.parseInt(req.getParameter("id"));
+        Company c = companyDao.getCompanyById(id);
+
+        out.println("<!DOCTYPE html><html><head><title>Update Company</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("</head><body><div class='container mt-4'>");
+        out.println("<h2>Update Company</h2>");
+        out.println("<link rel='stylesheet' href='CSS/Admin.css'>");
+        out.println("<form method='post' action='updateCompany'>");
+        out.println("<input type='hidden' name='id' value='" + c.getId() + "'/>");
+        out.println("Name: <input type='text' name='name' value='" + c.getName() + "' required><br>");
+        out.println("Location: <input type='text' name='location' value='" + c.getLocation() + "' required><br>");
+        out.println("Package (CTC): <input type='number' step='0.01' name='package' value='" + c.getPackageAmount() + "' required><br>");
+        out.println("Job Role: <input type='text' name='jobRole' value='" + c.getJobRole() + "' required><br>");
+        out.println("Eligibility Criteria: <input type='text' name='eligibility' value='" + c.getEligibilityCriteria() + "' required><br>");
+        out.println("Last Date to Apply: <input type='date' name='lastDate' value='" + c.getLastDateToApply() + "' required><br>");
+        out.println("Status: <select name='status'>");
+        out.println("<option value='Open'" + ("Open".equalsIgnoreCase(c.getStatus()) ? " selected" : "") + ">Open</option>");
+        out.println("<option value='Closed'" + ("Closed".equalsIgnoreCase(c.getStatus()) ? " selected" : "") + ">Closed</option>");
+        out.println("</select><br>");
+        out.println("<button type='submit' class='btn btn-success mt-2'>Update Company</button>");
+        out.println("</form>");
+
+        out.println("</div></body></html>");
+    }
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	
+}

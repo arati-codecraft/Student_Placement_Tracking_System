@@ -1,0 +1,36 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.PlacementDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/updatePlacementStatus")
+public class UpdatePlacementStatusServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idParam = req.getParameter("id");
+        String status = req.getParameter("status");
+
+        if (idParam != null && status != null) {
+            int id = Integer.parseInt(idParam);
+            placementDao.updateStatus(id, status);
+        }
+
+        // Redirect back to dashboard (or tracker if you prefer)
+        resp.sendRedirect(req.getContextPath() + "/admindashboard");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        doGet(req, resp);
+    }
+}

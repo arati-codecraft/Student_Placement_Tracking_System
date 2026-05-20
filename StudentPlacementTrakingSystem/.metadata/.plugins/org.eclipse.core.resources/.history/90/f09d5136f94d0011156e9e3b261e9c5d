@@ -1,0 +1,37 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/updateplacemetstatus")
+public class UpdatePlacemetStatusServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        int id = Integer.parseInt(request.getParameter("id"));
+        String status = request.getParameter("status");
+
+        AdminDao dao = new AdminDaoImpl();
+        dao.updateStatus(id, status);
+
+        response.setContentType("application/json");
+        response.getWriter().write("{\"message\":\"Status Updated Successfully\"}");
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

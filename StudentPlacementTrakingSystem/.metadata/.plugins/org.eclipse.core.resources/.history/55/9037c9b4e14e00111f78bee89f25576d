@@ -1,0 +1,73 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+import org.placepro.model.Users;
+import org.placepro.dao.StudentDao;
+import org.placepro.daoImpl.StudentDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/managestudent")
+public class ManageStudentServlet extends HttpServlet {
+    private StudentDao studentDao = new StudentDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        // Handle delete
+        String deleteId = req.getParameter("deleteId");
+        if (deleteId != null) {
+            int id = Integer.parseInt(deleteId);
+            studentDao.deleteStudent(id);
+            resp.sendRedirect(req.getContextPath() + "/managestudent");
+            return;
+        }
+
+        List<Users> students = studentDao.getAllStudents();
+
+        out.println("<!DOCTYPE html><html><head><title>Manage Students</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("</head><body><div class='container mt-4'>");
+        out.println("<h2>Manage Students</h2>");
+
+        // Add form
+        out.println("<form method='post'>");
+        out.println("Name: <input type='text' name='name' required>");
+        out.println("Email: <input type='email' name='email' required>");
+      
+        out.println("<button type='submit' class='btn btn-primary'>Add Student</button>");
+        out.println("</form><hr>");
+
+        // Student table
+        out.println("<table class='table table-bordered'><thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Action</th></tr></thead><tbody>");
+        for (Users u : students) {
+            out.println("<tr>");
+            out.println("<td>" + u.getId() + "</td>");
+            out.println("<td>" + u.getName() + "</td>");
+            out.println("<td>" + u.getEmail() + "</td>");
+            out.println("<td>");
+            out.println("<a href='managestudent?deleteId=" + u.getId() + "' class='btn btn-danger btn-sm'>Delete</a> ");
+            out.println<a href='updateUser?id=3' class='btn btn-warning btn-sm'>Edit</a>")
+            out.println("</td>");
+
+            out.println("</tr>");
+        }
+        out.println("</tbody></table></div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Users student = new Users();
+        student.setName(req.getParameter("name"));
+        student.setEmail(req.getParameter("email"));
+        student.setRole("Student");
+
+        studentDao.addStudent(student);
+        resp.sendRedirect(req.getContextPath() + "/managestudent");
+    }
+}

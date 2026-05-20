@@ -1,0 +1,46 @@
+package org.placepro.daoImpl;
+ import java.util.List;
+
+import org.placepro.dao.StudentDao;
+import org.placepro.model.Users;
+import org.placepro.repository.StudentRepository;
+import org.placepro.repositoryImpl.StudentRepositoryImpl;
+
+public class StudentDaoImpl implements StudentDao {
+    private StudentRepository repo = new StudentRepositoryImpl();
+
+    @Override
+    public void addStudent(Users student) {
+        repo.save(student);
+    }
+
+    @Override
+    public void deleteStudent(int id) {
+        repo.delete(id);
+    }
+
+    @Override
+    public List<Users> getAllStudents() {
+        return repo.findAllStudents();
+    }
+    
+    @Override
+    public Users getStudentById(int id) {
+        return repo.findById(id);
+    }
+
+    @Override
+    public void updateStudent(Users student) {
+        repo.update(student);
+    }
+
+    @Override
+    public void updateStatus(int id, String status) {
+        repo.updateStatus(id, status);
+    }
+
+    @Override
+    public List<Users> searchUsers(String course, Double percentage, String skill) {
+        return repo.search(course, percentage, skill);
+    }
+}

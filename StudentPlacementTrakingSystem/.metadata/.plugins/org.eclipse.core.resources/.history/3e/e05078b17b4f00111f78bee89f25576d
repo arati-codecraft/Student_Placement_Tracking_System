@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PlacePro Student Dashboard</title>
+
+<link rel="stylesheet" href="../CSS/dashboard.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<div class="sidebar">
+
+    <div class="logo">
+
+        PlacePro
+
+    </div>
+
+    <a href="#" onclick="showSection('dashboardSection')">
+
+        <i class="fa-solid fa-chart-line"></i>
+        Dashboard
+
+    </a>
+
+    <a href="#" onclick="showSection('profileSection')">
+
+        <i class="fa-solid fa-user"></i>
+        Student Profile
+
+    </a>
+
+    <a href="#" onclick="showSection('searchSection')">
+
+        <i class="fa-solid fa-magnifying-glass"></i>
+        Search Company
+
+    </a>
+
+    <a href="#" onclick="showSection('applicationSection')">
+
+        <i class="fa-solid fa-file-lines"></i>
+        Placement Applications
+
+    </a>
+
+    <a href="../WEB-INF/PlacePro.html" class="logout">
+
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+
+    </a>
+
+</div>
+
+<!-- ================= MAIN CONTENT ================= -->
+
+<div class="main-content">
+
+    <!-- ================= DASHBOARD ================= -->
+
+    <section id="dashboardSection">
+
+        <div class="welcome-box">
+
+            <div>
+
+                <h1>
+
+                    Welcome Rutuja 👋
+
+                </h1>
+
+                <p>
+
+                    Manage your placements,
+                    interviews,
+                    and company applications.
+
+                </p>
+
+            </div>
+
+            <button onclick="showSection('profileSection')">
+
+                Edit Profile
+
+            </button>
+
+        </div>
+
+        <!-- ================= CARDS ================= -->
+
+        <div class="card-container">
+
+            <div class="card" onclick="showCompanies()">
+
+                <i class="fa-solid fa-building"></i>
+
+                <h3>Total Companies</h3>
+
+                <h1>25</h1>
+
+            </div>
+
+            <div class="card" onclick="showApplied()">
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                <h3>Applied</h3>
+
+                <h1>8</h1>
+
+            </div>
+
+            <div class="card" onclick="showSelected()">
+
+                <i class="fa-solid fa-circle-check"></i>
+
+                <h3>Selected</h3>
+
+                <h1>2</h1>
+
+            </div>
+
+            <div class="card" onclick="showInterview()">
+
+                <i class="fa-solid fa-calendar-check"></i>
+
+                <h3>Interview</h3>
+
+                <h1>4</h1>
+
+            </div>
+
+        </div>
+
+        <!-- ================= RESULT BOX ================= -->
+
+        <div class="result-box" id="resultBox">
+
+            <h2>
+
+                Company Details
+
+            </h2>
+
+            <div id="resultContent">
+
+            </div>
+
+        </div>
+
+    </section>
+
+    <!-- ================= PROFILE ================= -->
+
+    <section id="profileSection" class="hide">
+
+        <div class="profile-box">
+
+            <h2>
+
+                Student Profile
+
+            </h2>
+
+            <div class="profile-grid">
+
+                <div class="profile-field">
+
+                    <label>Full Name</label>
+
+                    <input type="text" value="Rutuja Ghodake">
+
+                </div>
+
+                <div class="profile-field">
+
+                    <label>Email</label>
+
+                    <input type="email" value="rutuja@gmail.com">
+
+                </div>
+
+                <div class="profile-field">
+
+                    <label>Contact</label>
+
+                    <input type="text" value="9579550316">
+
+                </div>
+
+                <div class="profile-field">
+
+                    <label>Course</label>
+
+                    <input type="text" value="B.Tech Electrical">
+
+                </div>
+
+                <div class="profile-field">
+
+                    <label>Percentage</label>
+
+                    <input type="text" value="85%">
+
+                </div>
+
+                <div class="profile-field">
+
+                    <label>Skills</label>
+
+                    <input type="text"
+                    value="Java, SQL, HTML, CSS, JavaScript">
+
+                </div>
+
+            </div>
+
+            <button class="save-btn">
+
+                Save Profile
+
+            </button>
+
+        </div>
+
+    </section>
+
+    <!-- ================= SEARCH ================= -->
+
+    <section id="searchSection" class="hide">
+
+        <div class="search-box">
+
+            <h2>
+
+                Search Company
+
+            </h2>
+
+            <input type="text"
+            id="searchInput"
+            placeholder="Search company..."
+            onkeyup="searchCompany()">
+
+        </div>
+
+        <div class="company-list" id="companyList">
+
+        </div>
+
+    </section>
+
+    <!-- ================= APPLICATION TABLE ================= -->
+
+    <section id="applicationSection" class="hide">
+
+        <div class="table-box">
+
+            <div class="table-title">
+
+                Placement Applications
+
+            </div>
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Company</th>
+                        <th>Package</th>
+                        <th>Status</th>
+                        <th>Action</th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    <tr>
+
+                        <td>Google</td>
+
+                        <td>12 LPA</td>
+
+                        <td>
+
+                            <span class="applied">
+
+                                Applied
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <button class="view-btn">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>Microsoft</td>
+
+                        <td>15 LPA</td>
+
+                        <td>
+
+                            <span class="selected">
+
+                                Selected
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <button class="view-btn">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                    <tr>
+
+                        <td>TCS</td>
+
+                        <td>4 LPA</td>
+
+                        <td>
+
+                            <span class="rejected">
+
+                                Rejected
+
+                            </span>
+
+                        </td>
+
+                        <td>
+
+                            <button class="view-btn">
+
+                                View
+
+                            </button>
+
+                        </td>
+
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+</div>
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+let companies = [
+
+"TCS",
+"Wipro",
+"Infosys",
+"Google",
+"Microsoft",
+"TIAA",
+"Capgemini",
+"Cognizant",
+"Amazon",
+"Oracle",
+"IBM",
+"Accenture",
+"Deloitte",
+"HCL",
+"Tech Mahindra",
+"Persistent",
+"L&T",
+"Zoho",
+"Adobe",
+"Flipkart",
+"Paytm",
+"Reliance",
+"Hexaware",
+"Mindtree",
+"KPIT"
+
+];
+
+/* ================= SHOW SECTION ================= */
+
+function showSection(sectionId){
+
+    document.getElementById("dashboardSection").classList.add("hide");
+
+    document.getElementById("profileSection").classList.add("hide");
+
+    document.getElementById("searchSection").classList.add("hide");
+
+    document.getElementById("applicationSection").classList.add("hide");
+
+    document.getElementById(sectionId).classList.remove("hide");
+
+}
+
+/* ================= SEARCH ================= */
+
+function searchCompany(){
+
+    let input =
+    document.getElementById("searchInput").value.toLowerCase();
+
+    let list =
+    document.getElementById("companyList");
+
+    list.innerHTML = "";
+
+    companies.forEach(function(company){
+
+        if(company.toLowerCase().includes(input)){
+
+            list.innerHTML += `
+
+            <div class="company-card">
+
+                <h3>${company}</h3>
+
+                <button>
+
+                    Apply Now
+
+                </button>
+
+            </div>
+
+            `;
+
+        }
+
+    });
+
+}
+
+/* ================= TOTAL COMPANY ================= */
+
+function showCompanies(){
+
+    let content = "";
+
+    companies.forEach(function(company){
+
+        content += `
+
+        <div class="mini-card">
+
+            ${company}
+
+        </div>
+
+        `;
+
+    });
+
+    document.getElementById("resultContent").innerHTML = content;
+
+}
+
+/* ================= APPLIED ================= */
+
+function showApplied(){
+
+    document.getElementById("resultContent").innerHTML = `
+
+    <div class="mini-card">Google</div>
+
+    <div class="mini-card">Infosys</div>
+
+    <div class="mini-card">Wipro</div>
+
+    <div class="mini-card">TCS</div>
+
+    <div class="mini-card">Capgemini</div>
+
+    <div class="mini-card">IBM</div>
+
+    <div class="mini-card">Amazon</div>
+
+    <div class="mini-card">Oracle</div>
+
+    `;
+
+}
+
+/* ================= SELECTED ================= */
+
+function showSelected(){
+
+    document.getElementById("resultContent").innerHTML = `
+
+    <div class="mini-card">Microsoft</div>
+
+    <div class="mini-card">TIAA</div>
+
+    `;
+
+}
+
+/* ================= INTERVIEW ================= */
+
+function showInterview(){
+
+    document.getElementById("resultContent").innerHTML = `
+
+    <div class="mini-card">Google</div>
+
+    <div class="mini-card">Amazon</div>
+
+    <div class="mini-card">Accenture</div>
+
+    <div class="mini-card">Infosys</div>
+
+    `;
+
+}
+
+showCompanies();
+
+/* ================= SAVE PROFILE ================= */
+
+function saveProfile(){
+
+    alert("Profile Updated Successfully");
+
+    /* OPEN DASHBOARD AGAIN */
+
+    showSection('dashboardSection');
+
+}
+
+</script>
+
+</body>
+
+</html>

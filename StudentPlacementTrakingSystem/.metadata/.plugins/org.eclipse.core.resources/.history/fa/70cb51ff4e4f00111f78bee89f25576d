@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Admin Dashboard - PlacePro</title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<style>
+body {
+    margin:0;
+    font-family:'Segoe UI', sans-serif;
+    background:#f1f5f9;
+}
+.sidebar {
+    width:250px;
+    height:100vh;
+    position:fixed;
+    background:#0f172a;
+    color:white;
+    padding:20px;
+}
+.sidebar a {
+    display:block;
+    color:#cbd5f5;
+    text-decoration:none;
+    margin:15px 0;
+}
+.sidebar a:hover { color:white; }
+.logout-btn {
+    background:#ef4444;
+    border:none;
+    padding:10px;
+    width:100%;
+    border-radius:8px;
+    color:white;
+}
+.main {
+    margin-left:250px;
+    padding:30px;
+}
+.card-box {
+    border-radius:15px;
+    padding:20px;
+    background:white;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+.stat { font-size:30px; font-weight:bold; }
+.table-card {
+    background:white;
+    border-radius:15px;
+    padding:20px;
+    box-shadow:0 4px 15px rgba(0,0,0,0.1);
+}
+.badge-applied { background:orange; }
+.badge-selected { background:green; }
+.badge-rejected { background:red; }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h4>Admin Panel</h4>
+    <a href="AdminDashboard.html">Dashboard</a>
+    <a href="/StudentPlaceTrackingSytem/managestudent">Manage Students</a>
+    <a href="/StudentPlaceTrackingSytem/managecompany">Manage Companies</a>
+    <a href="/StudentPlaceTrackingSytem/placementTracker">Placement Tracker</a>
+
+    <a href="/StudentPlaceTrackingSytem/logout">
+        <button class="logout-btn mt-4">Logout</button>
+    </a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h3>Admin Dashboard</h3>
+            <p>Welcome, Admin 👋</p>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="row mb-4">
+        <div class="col-md-3"><div class="card-box"><p>Total Students</p><div class="stat text-primary" id="studentsCount">0</div></div></div>
+        <div class="col-md-3"><div class="card-box"><p>Total Companies</p><div class="stat text-success" id="companyCount">0</div></div></div>
+        <div class="col-md-3"><div class="card-box"><p>Applications</p><div class="stat text-warning" id="applicationCount">0</div></div></div>
+        <div class="col-md-3"><div class="card-box"><p>Selected Students</p><div class="stat text-info" id="selectedCount">0</div></div></div>
+    </div>
+
+    <!-- SEARCH -->
+    <input type="text" id="search" class="form-control mb-3"
+           placeholder="Search Students / Companies"
+           onkeyup="searchTable()">
+
+    <!-- TABLE -->
+    <div class="table-card">
+        <h5>Placement Applications</h5>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <th>Company</th>
+                    <th>Package</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- SCRIPT -->
+<script>
+let backendData = [];
+
+async function loadDashboard() {
+    try {
+        const res = await fetch("admindashboard");
+        const data = await res.json();
+
+        backendData = data.data || [];
+
+        document.getElementById("studentsCount").innerText = data.students;
+        document.getElementById("companyCount").innerText = data.companies;
+        document.getElementById("applicationCount").innerText = data.applications;
+        document.getElementById("selectedCount").innerText = data.selected;
+
+        renderTable();
+    } catch (error) {
+        console.error("Dashboard Load Error:", error);
+    }
+}
+
+function renderTable() {
+    let table = document.getElementById("tableBody");
+    table.innerHTML = "";
+    backendData.forEach((d) => {
+        let badgeClass = "badge-applied";
+        if (d.status === "Selected") badgeClass = "badge-selected";
+        else if (d.status === "Rejected") badgeClass = "badge-rejected";
+
+        table.innerHTML += `
+        <tr>
+            <td>${d.studentName}</td>
+            <td>${d.companyName}</td>
+            <td>${d.packageAmount}</td>
+            <td><span class="badge ${badgeClass}">${d.status}</span></td>
+            <td>
+                <button class="btn btn-success btn-sm" onclick="updateStatus(${d.id}, 'Selected')">Select</button>
+                <button class="btn btn-danger btn-sm" onclick="updateStatus(${d.id}, 'Rejected')">Reject</button>
+            </td>
+        </tr>`;
+    });
+}
+
+async function updateStatus(id, status) {
+    try {
+        await fetch("updatePlacementStatus", {   // ✅ corrected endpoint name
+            method: "POST",
+            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+            body: `id=${id}&status=${status}`
+        });
+        loadDashboard();
+    } catch (error) {
+        console.error("Update Error:", error);
+    }
+}
+
+function searchTable() {
+    let input = document.getElementById("search").value.toLowerCase();
+    let rows = document.querySelectorAll("#tableBody tr");
+    rows.forEach(row => {
+        row.style.display = row.innerText.toLowerCase().includes(input) ? "" : "none";
+    });
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,47 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import org.placepro.model.Users;
+import org.placepro.dao.StudentDao;
+import org.placepro.daoImpl.StudentDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/updateUser")
+public class UpdateUserServlet extends HttpServlet {
+    private StudentDao studentDao = new StudentDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Users u = studentDao.getStudentById(id);
+
+        if (u != null) {
+            u.setName(req.getParameter("name"));
+            u.setEmail(req.getParameter("email"));
+            u.setMobile(req.getParameter("mobile"));
+            u.setCourse(req.getParameter("course"));
+            if (req.getParameter("percentage") != null && !req.getParameter("percentage").isEmpty()) {
+                u.setPercentage(Double.parseDouble(req.getParameter("percentage")));
+            }
+            u.setSkills(req.getParameter("skills"));
+            u.setStatus(req.getParameter("status")); // Placed / Not Placed / Intern
+
+            studentDao.updateStudent(u);
+        }
+        resp.sendRedirect(req.getContextPath() + "/managestudent");
+    }
+
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

@@ -1,0 +1,28 @@
+package org.placepro.dao;
+
+public interface StudentDao
+{
+	public boolean registerStudent(Student s) {
+	    boolean status = false;
+	    try {
+	        Connection con = DBConnection.getConnection();
+	        PreparedStatement ps = con.prepareStatement(
+	            "INSERT INTO students(name,email,mobile,course,percentage,skills,password) VALUES(?,?,?,?,?,?,?)"
+	        );
+	        ps.setString(1, s.getName());
+	        ps.setString(2, s.getEmail());
+	        ps.setString(3, s.getMobile());
+	        ps.setString(4, s.getCourse());
+	        ps.setDouble(5, s.getPercentage());
+	        ps.setString(6, s.getSkills());
+	        ps.setString(7, s.getPassword());
+
+	        int i = ps.executeUpdate();
+	        if(i > 0) status = true;
+	    } catch(Exception e) {
+	        e.printStackTrace();
+	    }
+	    return status;
+	}
+
+}

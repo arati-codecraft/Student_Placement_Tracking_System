@@ -1,0 +1,11 @@
+package org.placepro.repository;
+
+import java.util.List;
+import org.placepro.model.Interview;
+
+public interface InterviewRepository {
+
+    List<Interview> getByStudentId(int studentId);
+
+    int countInterviews(int studentId);
+}

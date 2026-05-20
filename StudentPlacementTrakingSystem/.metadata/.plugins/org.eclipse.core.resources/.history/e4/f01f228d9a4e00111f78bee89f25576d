@@ -1,0 +1,59 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.*;
+import java.util.*;
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Users;
+import org.placepro.repository.StudentRepository;
+
+public class StudentRepositoryImpl extends DBConnection  implements StudentRepository {
+
+    @Override
+    public void save(Users student) {
+        try (Connection con = DBConnection.getConnection()) {
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO users(name,email,password,role) VALUES(?,?,?,?)"
+            );
+            ps.setString(1, student.getName());
+            ps.setString(2, student.getEmail());
+            ps.setString(3, student.getPassword());
+            ps.setString(4, "Student"); // force role as Student
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection con = DBConnection.getConnection()) {
+            PreparedStatement ps = con.prepareStatement("DELETE FROM users WHERE id=? AND role='Student'");
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Users> findAllStudents() {
+        List<Users> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement("SELECT * FROM users WHERE role='Student'");
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Users u = new Users();
+                u.setId(rs.getInt("id"));
+                u.setName(rs.getString("name"));
+                u.setEmail(rs.getString("email"));
+                u.setPassword(rs.getString("password"));
+                u.setRole(rs.getString("role"));
+                list.add(u);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+}

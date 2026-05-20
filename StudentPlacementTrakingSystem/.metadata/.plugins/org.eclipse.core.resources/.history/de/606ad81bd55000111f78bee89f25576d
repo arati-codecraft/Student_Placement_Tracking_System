@@ -1,0 +1,89 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+/**
+ * Servlet implementation class NotificationServlet
+ */
+@WebServlet("/notifications")
+public class NotificationsServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("<!DOCTYPE html><html><head><title>Notifications</title>");
+        out.println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+
+        // ✅ Inline CSS for notifications
+        out.println("<style>");
+        out.println(".notifications-container { padding:20px; }");
+        out.println(".notifications-list { list-style:none; padding:0; margin:0; }");
+        out.println(".notifications-list li { "
+                  + "background:#f9f9f9; margin:10px 0; padding:12px 15px; "
+                  + "border-radius:6px; border-left:5px solid #007bff; "
+                  + "box-shadow:0 2px 4px rgba(0,0,0,0.1); font-size:14px; }");
+        out.println(".notifications-list li:hover { background:#eef6ff; }");
+        out.println(".notifications-list .time { font-size:12px; color:#666; margin-right:8px; }");
+        out.println("h2 { margin-bottom:15px; font-size:20px; color:#333; }");
+        out.println("</style>");
+
+        out.println("</head><body>");
+        out.println("<div class='main notifications-container'>");
+        out.println("<h2><i class='fas fa-bell'></i> Your Notifications</h2>");
+        out.println("<ul class='notifications-list'>");
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "SELECT message, created_at FROM notifications WHERE student_id=? ORDER BY created_at DESC"
+             )) {
+            ps.setInt(1, u.getId());
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                out.println("<li><span class='time'>" + rs.getTimestamp("created_at") +
+                            "</span> " + rs.getString("message") + "</li>");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        out.println("</ul></div></body></html>");
+    }
+
+
+
+    
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

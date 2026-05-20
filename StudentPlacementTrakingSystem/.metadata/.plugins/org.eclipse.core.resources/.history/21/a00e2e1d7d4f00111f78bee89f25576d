@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Student Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+/* ===== SAME UI (SHORTENED CLEAN VERSION) ===== */
+
+body{
+    margin:0;
+    font-family:Arial;
+    background:linear-gradient(135deg,#d8c7f3,#c4b5fd,#f3e8ff);
+}
+
+.dashboard{
+    display:flex;
+    height:100vh;
+}
+
+/* SIDEBAR */
+.sidebar{
+    width:240px;
+    background:#6d28d9;
+    color:white;
+    padding:20px;
+}
+
+.sidebar h2{
+    text-align:center;
+}
+
+.sidebar button{
+    width:100%;
+    padding:12px;
+    margin:10px 0;
+    border:none;
+    background:none;
+    color:white;
+    text-align:left;
+    cursor:pointer;
+}
+
+/* MAIN */
+.main{
+    flex:1;
+    padding:20px;
+}
+
+/* CARDS */
+.cards{
+    display:flex;
+    gap:20px;
+    margin-top:20px;
+}
+
+.card{
+    background:white;
+    padding:20px;
+    border-radius:10px;
+    width:200px;
+    text-align:center;
+}
+
+.card h1{
+    color:#6d28d9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+
+        <h2>PlacePro</h2>
+
+        <button onclick="showSection('dashboard')">Dashboard</button>
+        <button onclick="showSection('profile')">Profile</button>
+        <button onclick="showSection('applications')">Applications</button>
+        <button onclick="showSection('apply')">Apply</button>
+
+    </div>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- DASHBOARD -->
+        <div id="dashboard">
+
+            <h1 id="welcomeText">Welcome Student 👋</h1>
+
+            <div class="cards">
+
+                <div class="card">
+                    <h3>Total Companies</h3>
+                    <h1 id="totalCompanies">0</h1>
+                </div>
+
+                <div class="card">
+                    <h3>Applications</h3>
+                    <h1 id="totalApplied">0</h1>
+                </div>
+
+                <div class="card">
+                    <h3>Selected</h3>
+                    <h1 id="totalSelected">0</h1>
+                </div>
+
+                <div class="card">
+                    <h3>Interviews</h3>
+                    <h1 id="totalInterviews">0</h1>
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- PROFILE -->
+        <div id="profile" style="display:none;">
+            <h2>Profile</h2>
+            <input placeholder="Name"><br><br>
+            <input placeholder="Email"><br><br>
+            <button>Update</button>
+        </div>
+
+        <!-- APPLICATIONS -->
+        <div id="applications" style="display:none;">
+            <h2>Your Applications</h2>
+            <p>Applications will load here...</p>
+        </div>
+
+        <!-- APPLY -->
+        <div id="apply" style="display:none;">
+            <h2>Available Companies</h2>
+            <p>Companies will load here...</p>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+
+/* ===== SECTION SWITCH ===== */
+function showSection(id){
+
+    document.getElementById("dashboard").style.display = "none";
+    document.getElementById("profile").style.display = "none";
+    document.getElementById("applications").style.display = "none";
+    document.getElementById("apply").style.display = "none";
+
+    document.getElementById(id).style.display = "block";
+}
+
+/* ===== LOAD DATA FROM SERVLET ===== */
+function loadDashboard(){
+
+    fetch("studentDashboard")
+    .then(res => res.json())
+    .then(data => {
+
+        document.getElementById("totalCompanies").innerText = data.companies;
+        document.getElementById("totalApplied").innerText = data.applied;
+        document.getElementById("totalSelected").innerText = data.selected;
+        document.getElementById("totalInterviews").innerText = data.interviews;
+
+    })
+    .catch(err => console.log(err));
+}
+
+/* CALL ON LOAD */
+window.onload = loadDashboard;
+
+</script>
+
+</body>
+</html>

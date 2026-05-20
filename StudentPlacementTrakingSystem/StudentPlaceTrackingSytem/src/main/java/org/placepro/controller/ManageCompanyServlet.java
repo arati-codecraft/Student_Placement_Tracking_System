@@ -1,0 +1,119 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Company;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/managecompany")
+public class ManageCompanyServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        // Handle delete
+        String deleteId = req.getParameter("deleteId");
+        if (deleteId != null) {
+            int id = Integer.parseInt(deleteId);
+            companyDao.deleteCompany(id);
+            resp.sendRedirect(req.getContextPath() + "/managecompany");
+            return;
+        }
+
+        List<Company> companies = companyDao.getAllCompanies();
+
+        out.println("<!DOCTYPE html><html lang='en'><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        out.println("<title>Manage Companies</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css'>");
+        out.println("<link rel='stylesheet' href='CSS/Admin.css'>"); // ✅ external CSS
+        out.println("</head><body>");
+
+        // Sidebar
+        out.println("<div class='sidebar'>"
+            + "<div class='sidebar-header'><h5 class='fw-bold text-primary mb-0'>Place<span class='text-muted'>Pro</span></h5></div>"
+            + "<div class='sidebar-user'><div class='user-img'>A</div><div><div class='fw-bold' style='font-size:13px;'>Admin</div><div style='font-size:11px;color:#777;'>Administrator</div></div></div>"
+            + "<div class='nav-label'>Navigation</div>"
+            + "<a href='admindashboard'><i class='bi bi-speedometer2'></i> Dashboard</a>"
+            + "<a href='managestudent'><i class='bi bi-people'></i> Manage Students</a>"
+            + "<a class='active' href='managecompany'><i class='bi bi-building'></i> Manage Companies</a>"
+            + "<a href='placementTracker'><i class='bi bi-journal-text'></i> Placement Tracker</a>"
+            +" <a href='SuccessStories.html'><i class=\"bi bi-trophy\"></i>Success Stories</a>"
+            +"<br>"
+            + "<a class='logout' href='logout'><i class='bi bi-box-arrow-right'></i> Logout</a>"
+            + "</div>");
+
+        // Header
+        out.println("<div class='top-header'>"
+            + "<h4 class='mb-0'>Manage Companies</h4>"
+            + "<div><i class='bi bi-bell fs-5'></i><i class='bi bi-gear fs-5 ms-3'></i></div>"
+            + "</div>");
+
+        // Main
+        out.println("<div class='main'>"
+            + "<div class='hero-banner'><h2>Company Management</h2><p>Add, edit, or remove companies</p></div>");
+
+        // Add Company Form
+        out.println("<div class='form-card mb-4'>"
+            + "<form method='post' class='row g-3'>"
+            + "<div class='col-md-4'><input type='text' name='name' class='form-control' placeholder='Company Name' required></div>"
+            + "<div class='col-md-4'><input type='text' name='location' class='form-control' placeholder='Location' required></div>"
+            + "<div class='col-md-4'><input type='number' step='0.01' name='package' class='form-control' placeholder='Package (CTC)' required></div>"
+            + "<div class='col-md-6'><input type='text' name='jobRole' class='form-control' placeholder='Job Role' required></div>"
+            + "<div class='col-md-6'><input type='text' name='eligibility' class='form-control' placeholder='Eligibility Criteria' required></div>"
+            + "<div class='col-md-6'><input type='date' name='lastDate' class='form-control' required></div>"
+            + "<div class='col-md-6'><button type='submit' class='btn btn-primary w-100'>Add Company</button></div>"
+            + "</form></div>");
+
+        // Company Table
+        out.println("<div class='table-card'><h5>Company List</h5>");
+        out.println("<table class='table mt-3'>");
+        out.println("<thead><tr><th>ID</th><th>Name</th><th>Location</th><th>Package</th><th>Role</th><th>Eligibility</th><th>Deadline</th><th>Status</th><th>Action</th></tr></thead><tbody>");
+        for (Company c : companies) {
+            out.println("<tr>");
+            out.println("<td>" + c.getId() + "</td>");
+            out.println("<td>" + c.getName() + "</td>");
+            out.println("<td>" + c.getLocation() + "</td>");
+            out.println("<td>" + c.getPackageAmount() + "</td>");
+            out.println("<td>" + c.getJobRole() + "</td>");
+            out.println("<td>" + c.getEligibilityCriteria() + "</td>");
+            out.println("<td>" + c.getLastDateToApply() + "</td>");
+            out.println("<td>" + c.getStatus() + "</td>");
+            out.println("<td>"
+                + "<a href='updateCompanyForm?id=" + c.getId() + "' class='btn btn-warning btn-sm'>Edit</a> "
+                + "<a href='managecompany?deleteId=" + c.getId() + "' class='btn btn-danger btn-sm'>Delete</a>"
+                + "</td>");
+            out.println("</tr>");
+        }
+        out.println("</tbody></table></div></div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Company company = new Company();
+        company.setName(req.getParameter("name"));
+        company.setLocation(req.getParameter("location"));
+        company.setPackageAmount(Double.parseDouble(req.getParameter("package")));
+        company.setJobRole(req.getParameter("jobRole"));
+        company.setEligibilityCriteria(req.getParameter("eligibility"));
+        company.setLastDateToApply(java.sql.Date.valueOf(req.getParameter("lastDate")));
+        company.setStatus("Open");
+
+        companyDao.addCompany(company);
+        resp.sendRedirect(req.getContextPath() + "/managecompany");
+    }
+}

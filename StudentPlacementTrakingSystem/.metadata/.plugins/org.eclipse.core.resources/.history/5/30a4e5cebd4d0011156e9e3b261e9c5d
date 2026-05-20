@@ -1,0 +1,38 @@
+package org.placepro.repository;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.dao.AdminDao;
+
+public class AdminDaoImpl implements AdminDao {
+
+    @Override
+    public boolean validateLogin(String email, String password) {
+        boolean status = false;
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM admins WHERE email=? AND password=?"
+            );
+
+            ps.setString(1, email);
+            ps.setString(2, password);
+
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) {
+                status = true;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return status;
+    }
+}

@@ -1,0 +1,89 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.*;
+import java.util.*;
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Placement;
+import org.placepro.repository.PlacementRepository;
+
+public class PlacementRepositoryImpl implements PlacementRepository {
+
+    @Override
+    public List<Placement> findAllPlacements() {
+        List<Placement> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(
+                 "SELECT p.id, u.name AS studentName, c.name AS companyName, p.package, p.status " +
+                 "FROM placement p " +
+                 "JOIN users u ON p.student_id = u.id " +
+                 "JOIN company c ON p.company_id = c.id"
+             )) {
+
+            while (rs.next()) {
+                Placement pl = new Placement();
+                pl.setId(rs.getInt("id"));
+                pl.setStudentName(rs.getString("studentName"));
+                pl.setCompanyName(rs.getString("companyName"));
+                pl.setPackageAmount(rs.getDouble("package"));
+                pl.setStatus(rs.getString("status"));
+                list.add(pl);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public int countStudents() {
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM users WHERE role='Student'")) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    @Override
+    public int countCompanies() {
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM company")) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    @Override
+    public int countApplications() {
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM placement")) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    @Override
+    public int countSelected() {
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM placement WHERE status='Selected'")) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0;
+    }
+
+    @Override
+    public void updatePlacementStatus(int id, String status) {
+        try (Connection con = DBConnection.getConnection()) {
+            PreparedStatement ps = con.prepareStatement("UPDATE placement SET status=? WHERE id=?");
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

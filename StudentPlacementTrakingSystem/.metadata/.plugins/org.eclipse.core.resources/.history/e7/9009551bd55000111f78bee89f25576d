@@ -1,0 +1,41 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.UsersDao;
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/deleteUser")
+public class DeleteUserServlet extends HttpServlet {
+    private UsersLoginDao userDao = new UsersLoginDaoImpl();
+    private UsersDao userDao1 = new UsersDaoImpl();
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String idParam = req.getParameter("id");
+        if (idParam != null) {
+            int id = Integer.parseInt(idParam);
+            userDao.removeUser(id);
+        }
+        resp.sendRedirect("managestudent"); // reload student list
+        int id1 = Integer.parseInt(req.getParameter("id"));
+        userDao1.deleteUser(id1);
+        resp.sendRedirect(req.getContextPath() + "/viewUsers");
+    }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

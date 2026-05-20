@@ -1,0 +1,109 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.*;
+import java.util.*;
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Company;
+import org.placepro.repository.CompanyRepository;
+
+public class CompanyRepositoryImpl implements CompanyRepository {
+
+    @Override
+    public void save(Company company) {
+        String sql = "INSERT INTO company(name, location, packageAmount, jobRole, eligibilityCriteria, lastDateToApply, status) VALUES(?,?,?,?,?,?,?)";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, company.getName());
+            ps.setString(2, company.getLocation());
+            ps.setDouble(3, company.getPackageAmount());
+            ps.setString(4, company.getJobRole());
+            ps.setString(5, company.getEligibilityCriteria());
+            ps.setDate(6, new java.sql.Date(company.getLastDateToApply().getTime()));
+            ps.setString(7, company.getStatus());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace(); // replace with logger
+        }
+    }
+
+    @Override
+    public void update(Company company) {
+        String sql = "UPDATE company SET name=?, location=?, packageAmount=?, jobRole=?, eligibilityCriteria=?, lastDateToApply=?, status=? WHERE id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, company.getName());
+            ps.setString(2, company.getLocation());
+            ps.setDouble(3, company.getPackageAmount());
+            ps.setString(4, company.getJobRole());
+            ps.setString(5, company.getEligibilityCriteria());
+            ps.setDate(6, new java.sql.Date(company.getLastDateToApply().getTime()));
+            ps.setString(7, company.getStatus());
+            ps.setInt(8, company.getId());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        String sql = "DELETE FROM company WHERE id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Company> findAllCompanies() {
+        List<Company> list = new ArrayList<>();
+        String sql = "SELECT * FROM company";
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Company c = new Company();
+                c.setId(rs.getInt("id"));
+                c.setName(rs.getString("name"));
+                c.setLocation(rs.getString("location"));
+                c.setPackageAmount(rs.getDouble("packageAmount"));
+                c.setJobRole(rs.getString("jobRole"));
+                c.setEligibilityCriteria(rs.getString("eligibilityCriteria"));
+                c.setLastDateToApply(rs.getDate("lastDateToApply"));
+                c.setStatus(rs.getString("status"));
+                list.add(c);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public Company findById(int id) {
+        String sql = "SELECT * FROM company WHERE id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                Company c = new Company();
+                c.setId(rs.getInt("id"));
+                c.setName(rs.getString("name"));
+                c.setLocation(rs.getString("location"));
+                c.setPackageAmount(rs.getDouble("packageAmount"));
+                c.setJobRole(rs.getString("jobRole"));
+                c.setEligibilityCriteria(rs.getString("eligibilityCriteria"));
+                c.setLastDateToApply(rs.getDate("lastDateToApply"));
+                c.setStatus(rs.getString("status"));
+                return c;
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+}

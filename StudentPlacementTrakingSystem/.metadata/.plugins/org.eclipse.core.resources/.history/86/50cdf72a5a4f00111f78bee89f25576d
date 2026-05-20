@@ -1,0 +1,73 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Placement;
+import org.placepro.repository.PlacementRepository;
+ // adjust package to your DB utility
+
+public class PlacementRepositoryImpl extends DBConnection implements PlacementRepository {
+
+    @Override
+    public void save(int studentId, int companyId, double packageAmount) {
+        String sql = "INSERT INTO placements (student_id, company_id, status) VALUES (?, ?, 'Rejected')";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, companyId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Placement> findAll() {
+        List<Placement> list = new ArrayList<>();
+        String sql = SELECT p.id, u.name, u.email, u.course, u.education,
+        	       c.company_name, c.package, p.status
+        	       FROM placements p
+        	       JOIN users u ON p.student_id = u.id
+        	       JOIN companies c ON p.company_id = c.id;
+
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                Placement p = new Placement();
+                p.setId(rs.getInt("id"));
+                p.setStudentName(rs.getString("name"));
+                p.setEmail(rs.getString("email"));
+                p.setCourse(rs.getString("course"));
+                p.setEducation(rs.getString("education"));
+                p.setCompanyName(rs.getString("company_name"));
+                p.setPackageAmount(rs.getString("package")); // keep as String
+                p.setStatus(rs.getString("status"));
+                list.add(p);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public void updateStatus(int id, String status) {
+        String sql = "UPDATE placements SET status=? WHERE id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

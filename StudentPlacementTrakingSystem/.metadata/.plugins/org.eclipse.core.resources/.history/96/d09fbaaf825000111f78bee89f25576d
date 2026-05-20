@@ -1,0 +1,20 @@
+package org.placepro.model;
+import java.sql.Date;
+
+import lombok.*;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Setter
+@Getter
+public class Placement {
+
+	private int id;
+    private String studentName;
+    private String email;        
+    private String course;
+    private String education;
+    private String companyName;
+    private Double packageAmount;
+    private String status;
+}

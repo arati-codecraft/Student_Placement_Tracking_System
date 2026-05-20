@@ -1,0 +1,14 @@
+@Setter
+@Getter
+public class Placement {
+    private int id;
+    private int studentId;
+    private int companyId;
+    private Date applyDate;
+    private String status;
+
+    // ADD THESE (for join result)
+    private String studentName;
+    private String companyName;
+    private String packageName;
+}

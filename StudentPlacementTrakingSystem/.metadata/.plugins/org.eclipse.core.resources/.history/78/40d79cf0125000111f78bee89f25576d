@@ -1,0 +1,136 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            // ✅ COUNTS (COMMON METHOD)
+            int totalStudents = getCount(con, "SELECT COUNT(*) FROM users WHERE role='Student'");
+            int totalCompanies = getCount(con, "SELECT COUNT(*) FROM company");
+            int totalApplications = getCount(con, "SELECT COUNT(*) FROM placements");
+            int totalSelected = getCount(con, "SELECT COUNT(*) FROM placements WHERE status='Selected'");
+
+            // ================= HTML =================
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<meta charset='UTF-8'>");
+            out.println("<title>Admin Dashboard</title>");
+
+            // CSS
+            out.println("<style>");
+            out.println("body{font-family:Arial;background:#f1f5f9;margin:0;}");
+            out.println(".sidebar{width:220px;height:100vh;position:fixed;background:#0f172a;color:white;padding:20px;}");
+            out.println(".sidebar a{display:block;color:#cbd5f5;text-decoration:none;margin:10px 0;}");
+            out.println(".main{margin-left:240px;padding:30px;}");
+            out.println(".cards{display:flex;gap:20px;margin-bottom:30px;}");
+            out.println(".card{background:white;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);width:200px;text-align:center;}");
+            out.println("table{width:100%;border-collapse:collapse;background:white;}");
+            out.println("th,td{padding:10px;border:1px solid #ddd;text-align:center;}");
+            out.println("th{background:#f3f4f6;}");
+            out.println(".btn{padding:5px 10px;border:none;border-radius:5px;text-decoration:none;color:white;}");
+            out.println(".select{background:green;}");
+            out.println(".reject{background:red;}");
+            out.println("</style>");
+
+            out.println("</head>");
+            out.println("<body>");
+
+            // SIDEBAR
+            out.println("<div class='sidebar'>");
+            out.println("<h2>ADMIN PANEL</h2>");
+            out.println("<a href='admindashboard'>Dashboard</a>");
+            out.println("<a href='managestudent'>Manage Students</a>");
+            out.println("<a href='managecompany'>Manage Companies</a>");
+            out.println("<a href='placementTracker'>Placement Tracker</a>");
+            out.println("<a href='logout'>Logout</a>");
+            out.println("</div>");
+
+            // MAIN
+            out.println("<div class='main'>");
+
+            out.println("<h1>WELCOME ADMIN 👋</h1>");
+
+            // ✅ CARDS
+            out.println("<div class='cards'>");
+
+            out.println("<div class='card'><h3>Total Students</h3><p>" + totalStudents + "</p></div>");
+            out.println("<div class='card'><h3>Total Companies</h3><p>" + totalCompanies + "</p></div>");
+            out.println("<div class='card'><h3>Total Applications</h3><p>" + totalApplications + "</p></div>");
+            out.println("<div class='card'><h3>Selected Students</h3><p>" + totalSelected + "</p></div>");
+
+            out.println("</div>");
+
+            // ✅ PLACEMENT TABLE
+            out.println("<h2>Placement Applications</h2>");
+
+            ResultSet rs = con.createStatement().executeQuery(
+                "SELECT p.id, u.name, u.email, c.name AS company, p.status " +
+                "FROM placements p " +
+                "JOIN users u ON p.student_id = u.id " +
+                "JOIN company c ON p.company_id = c.id"
+            );
+
+            out.println("<table>");
+            out.println("<tr><th>ID</th><th>Student</th><th>Email</th><th>Company</th><th>Status</th><th>Action</th></tr>");
+
+            while (rs.next()) {
+
+                int id = rs.getInt("id");
+
+                out.println("<tr>");
+                out.println("<td>" + id + "</td>");
+                out.println("<td>" + rs.getString("name") + "</td>");
+                out.println("<td>" + rs.getString("email") + "</td>");
+                out.println("<td>" + rs.getString("company") + "</td>");
+                out.println("<td>" + rs.getString("status") + "</td>");
+
+                out.println("<td>");
+                out.println("<a class='btn select' href='updatePlacementStatus?id=" + id + "&status=Selected'>Select</a> ");
+                out.println("<a class='btn reject' href='updatePlacementStatus?id=" + id + "&status=Rejected'>Reject</a>");
+                out.println("</td>");
+
+                out.println("</tr>");
+            }
+
+            out.println("</table>");
+
+            out.println("</div>"); // main
+            out.println("</body>");
+            out.println("</html>");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // ✅ COMMON COUNT METHOD
+    private int getCount(Connection con, String sql) {
+        int count = 0;
+        try {
+            ResultSet rs = con.createStatement().executeQuery(sql);
+            if (rs.next()) count = rs.getInt(1);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return count;
+    }
+}

@@ -1,0 +1,51 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/updateProfile")
+public class ProfileEditServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse resp)
+            throws IOException {
+
+        try {
+
+            HttpSession session = req.getSession();
+
+            int id = (int) session.getAttribute("userId");
+
+            Connection con = DBConnection.getConnection();
+
+            PreparedStatement ps = con.prepareStatement(
+                    "UPDATE users SET name=?, mobile=?, course=?, percentage=?, skills=? WHERE id=?");
+
+            ps.setString(1, req.getParameter("name"));
+            ps.setString(2, req.getParameter("mobile"));
+            ps.setString(3, req.getParameter("course"));
+            ps.setDouble(4,
+                    Double.parseDouble(
+                            req.getParameter("percentage")));
+
+            ps.setString(5,
+                    req.getParameter("skills"));
+
+            ps.setInt(6, id);
+
+            ps.executeUpdate();
+
+            resp.sendRedirect("profile.html");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

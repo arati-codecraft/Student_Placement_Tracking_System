@@ -1,0 +1,36 @@
+@WebServlet("/studentInterviews")
+public class StudentInterviewServlet extends HttpServlet {
+
+    private InterviewDao dao = new InterviewDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        resp.setContentType("text/html");
+
+        try {
+            int studentId = (int) req.getSession().getAttribute("userId");
+
+            List<Interview> list = dao.getStudentInterviews(studentId);
+
+            PrintWriter out = resp.getWriter();
+
+            out.println("<h2>My Interviews</h2>");
+
+            for (Interview i : list) {
+                out.println("<p>");
+                out.println("Company: " + i.getCompanyName() + "<br>");
+                out.println("Date: " + i.getInterviewDate() + "<br>");
+                out.println("Time: " + i.getInterviewTime() + "<br>");
+                out.println("Mode: " + i.getMode() + "<br>");
+                out.println("Location: " + i.getLocation() + "<br>");
+                out.println("Status: " + i.getStatus());
+                out.println("</p><hr>");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

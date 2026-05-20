@@ -1,0 +1,46 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import org.placepro.dao.UsersDao;
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/addUser")
+public class AddUserServlet extends HttpServlet {
+    private UsersDao userDao = new UsersDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Users u = new Users();
+        u.setName(req.getParameter("name"));
+        u.setEmail(req.getParameter("email"));
+        u.setMobile(req.getParameter("mobile"));
+        u.setCourse(req.getParameter("course"));
+
+        // Defensive check for percentage
+        String perc = req.getParameter("percentage");
+        if (perc != null && !perc.isEmpty()) {
+            u.setPercentage(Double.parseDouble(perc));
+        }
+
+        u.setSkills(req.getParameter("skills"));
+        u.setPassword(req.getParameter("password"));
+        u.setRole("Student");   // ✅ Capitalized for consistency
+        u.setStatus("Not Placed");
+
+        userDao.addUser(u);
+        resp.sendRedirect(req.getContextPath() + "/viewUsers");
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // If someone hits /addUser with GET, just forward to a form page
+        resp.sendRedirect(req.getContextPath() + "/managestudent");
+    }
+}

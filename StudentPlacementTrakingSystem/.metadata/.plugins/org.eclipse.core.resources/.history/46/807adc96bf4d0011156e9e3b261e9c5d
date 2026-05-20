@@ -1,0 +1,5 @@
+package org.placepro.dao;
+
+public interface AdminDao {
+    boolean validateLogin(String email, String password);
+}

@@ -1,0 +1,58 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.UsersDao;
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/viewUsers")
+public class ViewUsersServlet extends HttpServlet {
+    private UsersDao userDao = new UsersDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        // ✅ Fetch only students
+        List<Users> users = userDao.getAllStudents();  // make sure DAO filters role='Student'
+
+        out.println("<!DOCTYPE html><html><head><title>Students</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("</head><body><div class='container mt-4'>");
+        out.println("<h2>All Students</h2>");
+        out.println("<table class='table table-bordered'><thead>");
+        out.println("<tr><th>ID</th><th>Name</th><th>Email</th><th>Course</th><th>CGPA</th><th>Skills</th><th>Status</th><th>Action</th></tr>");
+        out.println("</thead><tbody>");
+        for (Users u : users) {
+            out.println("<tr>");
+            out.println("<td>" + u.getId() + "</td>");
+            out.println("<td>" + u.getName() + "</td>");
+            out.println("<td>" + u.getEmail() + "</td>");
+            out.println("<td>" + u.getCourse() + "</td>");
+            out.println("<td>" + u.getPercentage() + "</td>");
+            out.println("<td>" + u.getSkills() + "</td>");
+            out.println("<td>" + u.getStatus() + "</td>");
+            out.println("<td>");
+            out.println("<a href='updateUser?id=" + u.getId() + "' class='btn btn-warning btn-sm'>Edit</a> ");
+            out.println("<a href='deleteUser?id=" + u.getId() + "' class='btn btn-danger btn-sm'>Delete</a>");
+            out.println("</td>");
+            out.println("</tr>");
+        }
+        out.println("</tbody></table></div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+}

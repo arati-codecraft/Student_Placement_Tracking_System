@@ -1,0 +1,144 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request,
+            HttpServletResponse response) throws IOException {
+
+        response.setContentType("text/html");
+
+        PrintWriter out = response.getWriter();
+
+        int totalStudents = 0;
+        int totalCompanies = 0;
+        int totalApplications = 0;
+        int totalSelected = 0;
+
+        try {
+
+            Connection con = DBConnection.getConnection();
+
+            // ✅ TOTAL STUDENTS
+            String studentSql = "SELECT COUNT(*) FROM users WHERE role='Student'";
+            PreparedStatement ps1 = con.prepareStatement(studentSql);
+            ResultSet rs1 = ps1.executeQuery();
+
+            if (rs1.next()) {
+                totalStudents = rs1.getInt(1);
+            }
+
+            // ✅ TOTAL COMPANIES
+            String companySql = "SELECT COUNT(*) FROM company";
+            PreparedStatement ps2 = con.prepareStatement(companySql);
+            ResultSet rs2 = ps2.executeQuery();
+
+            if (rs2.next()) {
+                totalCompanies = rs2.getInt(1);
+            }
+
+            // ✅ TOTAL APPLICATIONS
+            String appSql = "SELECT COUNT(*) FROM placements";
+            PreparedStatement ps3 = con.prepareStatement(appSql);
+            ResultSet rs3 = ps3.executeQuery();
+
+            if (rs3.next()) {
+                totalApplications = rs3.getInt(1);
+            }
+
+            // 🔥 ✅ TOTAL SELECTED (CORRECT LOGIC)
+            String selSql = "SELECT COUNT(DISTINCT student_id) FROM placements WHERE status='Selected'";
+            PreparedStatement ps4 = con.prepareStatement(selSql);
+            ResultSet rs4 = ps4.executeQuery();
+
+            if (rs4.next()) {
+                totalSelected = rs4.getInt(1);
+            }
+
+            // ================= HTML =================
+
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<meta charset='UTF-8'>");
+            out.println("<title>Admin Dashboard</title>");
+
+            // Simple CSS
+            out.println("<style>");
+            out.println("body{font-family:Arial;background:#f1f5f9;margin:0;}");
+            out.println(".sidebar{width:220px;height:100vh;position:fixed;background:#0f172a;color:white;padding:20px;}");
+            out.println(".sidebar a{display:block;color:#cbd5f5;text-decoration:none;margin:10px 0;}");
+            out.println(".main{margin-left:240px;padding:30px;}");
+            out.println(".cards{display:flex;gap:20px;}");
+            out.println(".card{background:white;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);width:200px;text-align:center;}");
+            out.println("h1{margin-bottom:20px;}");
+            out.println("</style>");
+
+            out.println("</head>");
+            out.println("<body>");
+
+            // SIDEBAR
+            out.println("<div class='sidebar'>");
+            out.println("<h2>ADMIN PANEL</h2>");
+            out.println("<a href='admindashboard'>Dashboard</a>");
+            out.println("<a href='managestudent'>Manage Students</a>");
+            out.println("<a href='managecompany'>Manage Companies</a>");
+            out.println("<a href='placementTracker'>Placement Tracker</a>");
+            out.println("<a href='logout'>Logout</a>");
+            out.println("</div>");
+
+            // MAIN CONTENT
+            out.println("<div class='main'>");
+
+            out.println("<h1>WELCOME ADMIN 👋</h1>");
+
+            out.println("<div class='cards'>");
+
+            // CARD 1
+            out.println("<div class='card'>");
+            out.println("<h3>Total Students</h3>");
+            out.println("<p>" + totalStudents + "</p>");
+            out.println("</div>");
+
+            // CARD 2
+            out.println("<div class='card'>");
+            out.println("<h3>Total Companies</h3>");
+            out.println("<p>" + totalCompanies + "</p>");
+            out.println("</div>");
+
+            // CARD 3
+            out.println("<div class='card'>");
+            out.println("<h3>Total Applications</h3>");
+            out.println("<p>" + totalApplications + "</p>");
+            out.println("</div>");
+
+            // CARD 4
+            out.println("<div class='card'>");
+            out.println("<h3>Selected Students</h3>");
+            out.println("<p>" + totalSelected + "</p>");
+            out.println("</div>");
+
+            out.println("</div>"); // cards
+
+            out.println("</div>"); // main
+
+            out.println("</body>");
+            out.println("</html>");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

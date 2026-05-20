@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>PlacePro - Placement Tracking System</title>
+
+<link rel="stylesheet" href="CSS/placepro.css">
+
+</head>
+
+<body>
+
+	<!-- ================= NAVBAR ================= -->
+
+	<nav class="navbar">
+
+		<div class="logo-section">
+
+			<img src="images/Logo1.png" class="logo-img">
+
+		</div>
+
+		<ul class="menu">
+
+			<li><a href="#home">Home</a></li>
+
+			<li><a href="#about">About</a></li>
+
+			<li><a href="#services">Services</a></li>
+
+			<li><a href="#jobs">Jobs</a></li>
+
+			<li><a href="#contact">Contact</a></li>
+
+		</ul>
+
+		<div class="buttons">
+
+			<button class="login-btn" id="signin">SIGN IN</button>
+
+		</div>
+
+	</nav>
+
+	<!-- ================= HERO SECTION ================= -->
+
+	<section id="home" class="hero">
+
+		<h1>BUILD YOUR CAREER</h1>
+
+		<h2>SHAPE YOUR FUTURE</h2>
+
+		<p>Empowering Students, Connecting Opportunities, Creating
+			Successful Careers.</p>
+
+		<button class="start-btn">YOUR CAREER...OUR MISSION</button>
+
+	</section>
+
+	<!-- ================= ABOUT ================= -->
+
+	<section class="about" id="about">
+
+		<div class="about-text">
+
+			<h2>About Our Institute</h2>
+
+			<p>
+
+				Our institute provides excellent placement opportunities for
+				students through top IT companies. We help students build strong
+				skills in Java, Web Development, SQL, React, Aptitude, and Interview
+				Preparation. PlacePro helps students track placement activities, job
+				applications, and placement status online easily. <br> <br>
+				The platform is designed to simplify the entire placement process
+				for both students and administrators. Students can create profiles,
+				upload resumes, apply for jobs, and monitor their placement progress
+				in real time. <br> <br> PlacePro also improves
+				communication between students and placement coordinators by
+				providing instant updates about new job openings, interview rounds,
+				and placement results.
+
+			</p>
+
+		</div>
+
+		<div class="about-image">
+
+			<img src="images/About.png">
+
+		</div>
+
+	</section>
+
+	<!-- ================= SERVICES ================= -->
+
+	<section class="services" id="services">
+
+		<h2 class="service-title">Our Services</h2>
+
+		<div class="service-container">
+
+			<!-- CARD 1 -->
+
+			<div class="service-box">
+
+				<img src="images/student.png" class="service-img">
+
+				<div class="service-card">
+
+					<h3>🎓 Student Management</h3>
+
+					<p>Manage student profiles, academic records, resumes, skills,
+						and placement activities.</p>
+
+					<a href="#signin"> Learn More → </a>
+
+				</div>
+
+			</div>
+
+			<!-- CARD 2 -->
+
+			<div class="service-box">
+
+				<img src="images/company.png" class="service-img">
+
+				<div class="service-card">
+
+					<h3>🏢 Company Management</h3>
+
+					<p>Manage companies, recruitment drives, interviews, and
+						eligibility criteria.</p>
+
+					<a href="#signin"> Learn More → </a>
+
+				</div>
+
+			</div>
+
+			<!-- CARD 3 -->
+
+			<div class="service-box">
+
+				<img src="images/placement.png" class="service-img">
+
+				<div class="service-card">
+
+					<h3>📊 Placement Tracking</h3>
+
+					<p>Track placement status, applications, selected students, and
+						placement reports.</p>
+
+					<a href="#signin"> Learn More → </a>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</section>
+
+	<!-- ================= JOBS SECTION ================= -->
+
+	<section class="jobs" id="jobs">
+
+		<h2>Latest Jobs</h2>
+
+		<div class="job-slider">
+
+			<div class="job-track">
+
+				<!-- JOB 1 -->
+
+				<div class="job-card">
+
+					<h3>TCS</h3>
+
+					<p>Package : 4 LPA</p>
+
+					<p>Location : Pune</p>
+
+					<button class="apply-btn">Apply Now</button>
+				</div>
+
+				<!-- JOB 2 -->
+
+				<div class="job-card">
+
+					<h3>Infosys</h3>
+
+					<p>Package : 5 LPA</p>
+
+					<p>Location : Mumbai</p>
+
+					<button class="apply-btn">Apply Now</button>
+
+				</div>
+
+				<!-- JOB 3 -->
+
+				<div class="job-card">
+
+					<h3>Wipro</h3>
+
+					<p>Package : 3.5 LPA</p>
+
+					<p>Location : Bangalore</p>
+
+					<button class="apply-btn">Apply Now</button>
+				</div>
+
+				<!-- JOB 4 -->
+
+				<div class="job-card">
+
+					<h3>Google</h3>
+
+					<p>Package : 12 LPA</p>
+
+					<p>Location : Hyderabad</p>
+
+					<button class="apply-btn">Apply Now</button>
+				</div>
+
+				<!-- JOB 5 -->
+
+				<div class="job-card">
+
+					<h3>Microsoft</h3>
+
+					<p>Package : 15 LPA</p>
+
+					<p>Location : Pune</p>
+
+					<button class="apply-btn">Apply Now</button>
+				</div>
+
+				<!-- DUPLICATE FOR SMOOTH SLIDER -->
+
+				<div class="job-card">
+
+					<h3>TCS</h3>
+
+					<p>Package : 4 LPA</p>
+
+					<p>Location : Pune</p>
+
+					<button class="apply-btn">Apply Now</button>
+
+				</div>
+
+				<div class="job-card">
+
+					<h3>Infosys</h3>
+
+					<p>Package : 5 LPA</p>
+
+					<p>Location : Mumbai</p>
+
+					<button class="apply-btn">Apply Now</button>
+				</div>
+
+				<div class="job-card">
+
+					<h3>Wipro</h3>
+
+					<p>Package : 3.5 LPA</p>
+
+					<p>Location : Bangalore</p>
+
+					<button class="apply-btn">Apply Now</button>
+				</div>
+
+				<div class="job-card">
+
+					<h3>Google</h3>
+
+					<p>Package : 12 LPA</p>
+
+					<p>Location : Hyderabad</p>
+
+					<button class="apply-btn">Apply Now</button>
+
+				</div>
+
+				<div class="job-card">
+
+					<h3>Microsoft</h3>
+
+					<p>Package : 15 LPA</p>
+
+					<p>Location : Pune</p>
+
+					<button class="apply-btn">Apply Now</button>
+
+				</div>
+
+			</div>
+
+		</div>
+
+	</section>
+
+	<!-- ================= FOOTER TOP ================= -->
+
+	<section class="footer-top">
+
+		<h1>Get Ready For Your Dream Placement Career</h1>
+
+		<p>PlacePro helps students connect with top companies, track
+			placements, improve interview skills, and build a successful
+			professional future.</p>
+
+		<a href="#signin">
+
+			<button>Start Your Placement Journey</button>
+
+		</a>
+
+	</section>
+
+	<!-- ================= FOOTER ================= -->
+
+	<footer class="footer" id="contact">
+
+		<div class="footer-container">
+
+			<!-- FOOTER BOX 1 -->
+
+			<div class="footer-box">
+
+				<h2>PlacePro</h2>
+
+				<p>PlacePro is a smart placement tracking platform that helps
+					students manage job applications, placement activities, company
+					updates, and interview preparation efficiently.</p>
+
+			</div>
+
+			<!-- FOOTER BOX 2 -->
+
+			<div class="footer-box">
+
+				<h2>Quick Links</h2>
+
+				<ul class="footer-links">
+
+					<li><a href="#home">Home</a></li>
+
+					<li><a href="#about">About</a></li>
+
+					<li><a href="#services">Services</a></li>
+
+					<li><a href="#jobs">Jobs</a></li>
+
+					<li><a href="#contact">Contact</a></li>
+
+				</ul>
+
+			</div>
+
+			<!-- FOOTER BOX 3 -->
+
+			<div class="footer-box">
+
+				<h2>Contact Info</h2>
+
+				<p>Email : placepro@gmail.com</p>
+
+				<p style="margin-top: 15px;">Phone :+91 9579550316</p>
+
+				<div class="social-icons">
+
+					<a href="https://www.linkedin.com/in/placepro" target="_blank">
+
+						LinkedIn </a> <a href="https://www.instagram.com/placepro"
+						target="_blank"> Instagram </a>
+
+				</div>
+
+			</div>
+
+		</div>
+
+		<!-- FOOTER BOTTOM -->
+
+		<div class="footer-bottom">
+
+			<p>© 2026 PlacePro | All Rights Reserved</p>
+
+		</div>
+
+	</footer>
+
+	<script>
+
+// ================= BUTTON BLINK EFFECT =================
+
+function blinkSignIn(){
+
+    let btn = document.getElementById("signin");
+
+    btn.classList.add("blink-btn");
+
+    setTimeout(function(){
+
+        btn.classList.remove("blink-btn");
+
+    },2000);
+
+}
+
+// ================= START JOURNEY BUTTON =================
+
+document.querySelector(".footer-top button").addEventListener("click",function(){
+
+    blinkSignIn();
+
+});
+
+// ================= LEARN MORE BUTTONS =================
+
+let learnBtns = document.querySelectorAll(".service-card a");
+
+learnBtns.forEach(function(btn){
+
+    btn.addEventListener("click",function(){
+
+        blinkSignIn();
+
+    });
+
+});
+
+//=============apply button===============
+	
+	let applyBtns = document.querySelectorAll(".apply-btn");
+
+applyBtns.forEach(function(btn){
+
+    btn.addEventListener("click",function(){
+
+        blinkSignIn();
+
+    });
+
+});
+
+</script>
+
+</body>
+
+</html>

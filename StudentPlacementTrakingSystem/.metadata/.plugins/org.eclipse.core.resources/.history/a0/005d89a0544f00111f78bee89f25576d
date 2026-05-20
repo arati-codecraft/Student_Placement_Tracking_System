@@ -1,0 +1,26 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.PlacementDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/updateStatus")
+public class UpdateStatusServlet extends HttpServlet {
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int placementId = Integer.parseInt(req.getParameter("placementId"));
+        String status = req.getParameter("status");
+
+        placementDao.updateStatus(placementId, status);
+
+        // redirect back to tracker
+        resp.sendRedirect(req.getContextPath() + "/placementTracker");
+    }
+}

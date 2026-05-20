@@ -1,0 +1,228 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+
+    private ApplicationDao dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+
+        // SESSION CHECK
+        if (session == null || session.getAttribute("user") == null) {
+
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        List<Application> apps =
+                dao.getApplicationsByStudent(u.getId());
+
+        res.setContentType("text/html");
+
+        PrintWriter out = res.getWriter();
+
+        out.println("<!DOCTYPE html>");
+
+        out.println("<html lang='en'>");
+
+        out.println("<head>");
+
+        out.println("<meta charset='UTF-8'>");
+
+        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+
+        out.println("<title>Applications</title>");
+
+        out.println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+
+        // CSS
+        out.println("<style>");
+
+        out.println("*{margin:0;padding:0;box-sizing:border-box;font-family:Arial;}");
+
+        out.println("body{display:flex;background:#f4f7fb;}");
+
+        out.println(".sidebar{width:250px;height:100vh;background:#1e293b;color:white;padding:20px;position:fixed;}");
+
+        out.println(".logo{display:flex;align-items:center;gap:10px;margin-bottom:30px;}");
+
+        out.println(".nav-links{display:flex;flex-direction:column;gap:15px;}");
+
+        out.println(".nav-item{color:white;text-decoration:none;padding:12px;border-radius:8px;}");
+
+        out.println(".nav-item:hover,.active{background:#2563eb;}");
+
+        out.println(".logout-btn{margin-top:20px;background:#ef4444;color:white;padding:12px;border:none;border-radius:8px;width:100%;cursor:pointer;}");
+
+        out.println(".main{margin-left:250px;width:100%;padding:20px;}");
+
+        out.println("table{width:100%;border-collapse:collapse;background:white;border-radius:10px;overflow:hidden;}");
+
+        out.println("th,td{padding:15px;text-align:center;border-bottom:1px solid #ddd;}");
+
+        out.println("th{background:#2563eb;color:white;}");
+
+        out.println(".btn-accept{background:#22c55e;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;margin-right:5px;}");
+
+        out.println(".btn-reject{background:#ef4444;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;}");
+
+        out.println(".btn-withdraw{background:#f59e0b;color:white;border:none;padding:8px 12px;border-radius:5px;cursor:pointer;margin-top:5px;}");
+
+        out.println(".status{font-weight:bold;}");
+
+        out.println("</style>");
+
+        out.println("</head>");
+
+        out.println("<body>");
+
+        // SIDEBAR
+        out.println("<div class='sidebar'>");
+
+        out.println("<div class='logo'>");
+        out.println("<i class='fas fa-graduation-cap'></i>");
+        out.println("<h2>PlacePro</h2>");
+        out.println("</div>");
+
+        out.println("<div class='nav-links'>");
+
+        out.println("<a href='studentDashboard' class='nav-item'>");
+        out.println("<i class='fas fa-th-large'></i> Dashboard</a>");
+
+        out.println("<a href='profile' class='nav-item'>");
+        out.println("<i class='fas fa-user'></i> Profile</a>");
+
+        out.println("<a href='scheduleInterview' class='nav-item'>");
+        out.println("<i class='fas fa-calendar-alt'></i> Interviews</a>");
+
+        out.println("<a href='applications' class='nav-item active'>");
+        out.println("<i class='fas fa-file-alt'></i> Applications</a>");
+
+        out.println("<a href='applyPlacement' class='nav-item'>");
+        out.println("<i class='fas fa-paper-plane'></i> Apply</a>");
+
+        out.println("<a href='notifications' class='nav-item'>");
+        out.println("<i class='fas fa-bell'></i> Notifications</a>");
+
+        out.println("<a href='Coordinators.html' class='nav-item'>");
+        out.println("<i class='fas fa-users'></i> Coordinators</a>");
+
+        out.println("<a href='logout'>");
+        out.println("<button class='logout-btn'>");
+        out.println("<i class='fas fa-sign-out-alt'></i> Logout");
+        out.println("</button>");
+        out.println("</a>");
+
+        out.println("</div>");
+
+        out.println("</div>");
+
+        // MAIN CONTENT
+        out.println("<div class='main'>");
+
+        out.println("<h2 style='margin-bottom:20px;'>Your Applications</h2>");
+
+        out.println("<table>");
+
+        out.println("<tr>");
+        out.println("<th>Company</th>");
+        out.println("<th>Location</th>");
+        out.println("<th>Package</th>");
+        out.println("<th>Criteria</th>");
+        out.println("<th>Date</th>");
+        out.println("<th>Status</th>");
+        out.println("<th>Action</th>");
+        out.println("</tr>");
+
+        if (apps != null && !apps.isEmpty()) {
+
+            for (Application a : apps) {
+
+                out.println("<tr>");
+
+                out.println("<td>" + a.getCompanyName() + "</td>");
+
+                out.println("<td>" + a.getLocation() + "</td>");
+
+                out.println("<td>" + a.getPackageAmount() + "</td>");
+
+                out.println("<td>" + a.getEligibilityCriteria() + "</td>");
+
+                out.println("<td>" + a.getApplyDate() + "</td>");
+
+                out.println("<td class='status'>" + a.getStatus() + "</td>");
+
+                out.println("<td>");
+
+                // SHOW BUTTONS ONLY IF PENDING
+                if ("Pending".equalsIgnoreCase(a.getStatus())) {
+
+                    out.println("<form method='post' action='updateApplicationStatus'>");
+
+                    out.println("<input type='hidden' name='appId' value='" + a.getId() + "'>");
+
+                    out.println("<button type='submit' name='status' value='Accepted' class='btn-accept'>Accept</button>");
+
+                    out.println("<button type='submit' name='status' value='Rejected' class='btn-reject'>Reject</button>");
+
+                    out.println("</form>");
+
+                    out.println("<form method='post' action='withdrawApplication' style='margin-top:5px;' onsubmit=\"return confirm('Are you sure?');\">");
+
+                    out.println("<input type='hidden' name='appId' value='" + a.getId() + "'>");
+
+                    out.println("<button type='submit' class='btn-withdraw'>Withdraw</button>");
+
+                    out.println("</form>");
+                }
+
+                out.println("</td>");
+
+                out.println("</tr>");
+            }
+
+        } else {
+
+            out.println("<tr>");
+
+            out.println("<td colspan='7'>No Applications Found</td>");
+
+            out.println("</tr>");
+        }
+
+        out.println("</table>");
+
+        out.println("</div>");
+
+        out.println("</body>");
+
+        out.println("</html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse res)
+            throws ServletException, IOException {
+
+        doGet(req, res);
+    }
+}

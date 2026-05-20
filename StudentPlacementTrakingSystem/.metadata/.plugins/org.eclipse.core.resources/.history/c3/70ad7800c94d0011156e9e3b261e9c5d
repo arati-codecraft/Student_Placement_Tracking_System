@@ -1,0 +1,53 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/studentregistration")
+public class RegistrationServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String password = request.getParameter("password");
+        String confirmPassword = request.getParameter("confirmPassword");
+
+        if (!password.equals(confirmPassword)) {
+            response.sendRedirect("register.html?error=PasswordMismatch");
+            return;
+        }
+
+        Users user = new Users();
+        user.setName(request.getParameter("name"));
+        user.setEmail(request.getParameter("email"));
+        user.setMobile(request.getParameter("mobile"));
+        user.setCourse(request.getParameter("graduation"));
+        user.setPercentage(Double.parseDouble(request.getParameter("percentage")));
+        user.setSkills(request.getParameter("skills"));
+        user.setPassword(password);
+
+        UsersLoginDao dao = new UsersLoginDaoImpl();
+        boolean result = dao.registerUser(user);
+
+        if (result) {
+            response.sendRedirect("login.html?success=Registered");
+        } else {
+            response.sendRedirect("register.html?error=Failed");
+        }
+    }
+
+
+    // ✅ FIXED doGet
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.sendRedirect("register.html");
+    }
+}

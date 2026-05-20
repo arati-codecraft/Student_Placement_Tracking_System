@@ -1,0 +1,52 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Company;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/updateCompany")
+public class UpdateCompanyServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // Normally you would forward to a JSP form that loads company details by ID
+        // Example:
+        // int id = Integer.parseInt(req.getParameter("id"));
+        // Company company = companyDao.getCompanyById(id);
+        // req.setAttribute("company", company);
+        // req.getRequestDispatcher("/updateCompanyForm.jsp").forward(req, resp);
+
+        resp.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED, "GET not supported directly for update");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        try {
+            int id = Integer.parseInt(req.getParameter("id"));
+            Company c = companyDao.getCompanyById(id);
+
+            if (c != null) {
+                c.setPackageAmount(Double.parseDouble(req.getParameter("package")));
+                c.setEligibilityCriteria(req.getParameter("eligibility"));
+                c.setJobRole(req.getParameter("jobRole"));
+                c.setLastDateToApply(java.sql.Date.valueOf(req.getParameter("lastDate")));
+                c.setStatus(req.getParameter("status"));
+
+                companyDao.updateCompany(c);
+            }
+        } catch (NumberFormatException e) {
+            e.printStackTrace(); // log properly in production
+        }
+
+        resp.sendRedirect(req.getContextPath() + "/managecompany");
+    }
+}

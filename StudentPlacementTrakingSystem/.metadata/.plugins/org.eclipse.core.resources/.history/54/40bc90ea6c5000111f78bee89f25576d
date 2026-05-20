@@ -1,0 +1,59 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.PreparedStatement;
+import java.sql.*;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class NotificationServlet
+ */
+@WebServlet("/notifications")
+public class NotificationServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        PrintWriter out = resp.getWriter();
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            int sid = (int) req.getSession().getAttribute("userId");
+
+            PreparedStatement ps = con.prepareStatement(
+                "SELECT * FROM notifications WHERE student_id=?"
+            );
+            ps.setInt(1, sid);
+
+            ResultSet rs = ps.executeQuery();
+
+            out.println("<h2>Notifications</h2>");
+
+            while (rs.next()) {
+                out.println("<p>" + rs.getString("message") + "</p>");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

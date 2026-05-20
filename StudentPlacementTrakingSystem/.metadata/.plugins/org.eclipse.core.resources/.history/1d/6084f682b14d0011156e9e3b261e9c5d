@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<title>PlacePro Dashboard</title>
+
+<!-- 🔥 YOUR CSS FILE LINKED -->
+<link rel="stylesheet" href="CSS/PlacePro.css">
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR (FROM YOUR DESIGN) ================= -->
+<nav class="navbar">
+
+    <div class="logo-section">
+        <img src="IMG/Logo.png" class="logo-img">
+    </div>
+
+    <ul class="menu">
+
+        <li><a href="placepro.html">Home</a></li>
+        <li><a href="placepro.html#about">About</a></li>
+        <li><a href="placepro.html#services">Services</a></li>
+
+        <!-- 🔥 redirect to login -->
+        <li><a href="login.html">Jobs</a></li>
+
+        <li><a href="placepro.html#contact">Contact</a></li>
+
+    </ul>
+
+    <div class="buttons">
+
+        <!-- 🔥 LOGIN REDIRECT -->
+        <a href="login.html">
+            <button class="login-btn">SIGN IN</button>
+        </a>
+
+        <!-- 🔥 REGISTER REDIRECT -->
+        <a href="register.html">
+            <button class="login-btn">REGISTER</button>
+        </a>
+
+    </div>
+
+</nav>
+
+<!-- ================= DASHBOARD CONTENT ================= -->
+<section style="padding:80px; text-align:center;">
+
+    <h1>Welcome to PlacePro Dashboard 🎓</h1>
+
+    <p style="margin-top:20px;">
+        Use the navigation bar to access Login, Register, Jobs and other sections.
+    </p>
+
+    <!-- SAMPLE DASHBOARD CARDS -->
+    <div class="service-container" style="margin-top:50px;">
+
+        <div class="service-card">
+            <h3>👨‍🎓 Students</h3>
+            <p>120 Registered</p>
+        </div>
+
+        <div class="service-card">
+            <h3>🏢 Companies</h3>
+            <p>25 Active</p>
+        </div>
+
+        <div class="service-card">
+            <h3>📊 Placements</h3>
+            <p>40 Completed</p>
+        </div>
+
+    </div>
+
+</section>
+
+<!-- ================= FOOTER (YOUR STYLE) ================= -->
+<footer>
+    © 2026 PlacePro Placement Tracking System | Designed by Rutuja & Aarti 💙
+</footer>
+
+</body>
+</html>

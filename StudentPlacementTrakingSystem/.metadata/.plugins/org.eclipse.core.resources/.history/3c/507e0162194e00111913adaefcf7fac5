@@ -1,0 +1,55 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/managestudent")
+public class ManageStudentServlet extends HttpServlet {
+    private UsersLoginDao userDao = new UsersLoginDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        List<Users> students = userDao.getAllUsers();
+
+        out.println("<html><body>");
+        out.println("<h2>Manage Students</h2>");
+        out.println("<table border='1'><tr><th>ID</th><th>Name</th><th>Email</th><th>Mobile</th><th>Course</th><th>Percentage</th><th>Skills</th><th>Role</th><th>Action</th></tr>");
+        for (Users u : students) {
+            out.println("<tr><td>"+u.getId()+"</td><td>"+u.getName()+"</td><td>"+u.getEmail()+"</td>"
+                + "<td>"+u.getMobile()+"</td><td>"+u.getCourse()+"</td><td>"+u.getPercentage()+"</td>"
+                + "<td>"+u.getSkills()+"</td><td>"+u.getRole()+"</td>"
+                + "<td><a href='deleteUser?id="+u.getId()+"'>Delete</a></td></tr>");
+        }
+        out.println("</table>");
+        out.println("</body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        doGet(request, response);
+    }
+}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

@@ -1,0 +1,64 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        PrintWriter out = response.getWriter();
+
+        try {
+            AdminDao dao = new AdminDaoImpl();
+
+            List<Placement> list = dao.getAllPlacements();
+
+            StringBuilder json = new StringBuilder();
+
+            json.append("{");
+            json.append("\"students\":").append(dao.totalStudents()).append(",");
+            json.append("\"companies\":").append(dao.totalCompanies()).append(",");
+            json.append("\"applications\":").append(dao.totalApplications()).append(",");
+            json.append("\"selected\":").append(dao.totalSelected()).append(",");
+            json.append("\"data\":[");
+
+            for (int i = 0; i < list.size(); i++) {
+
+                Placement p = list.get(i);
+
+                json.append("{")
+                    .append("\"id\":").append(p.getId()).append(",")
+                    .append("\"studentName\":\"").append(p.getStudentName()).append("\",")
+                    .append("\"companyName\":\"").append(p.getCompanyName()).append("\",")
+                    .append("\"packageName\":\"").append(p.getPackageName()).append("\",")
+                    .append("\"status\":\"").append(p.getStatus()).append("\"")
+                    .append("}");
+
+                if (i < list.size() - 1) json.append(",");
+            }
+
+            json.append("]}");
+
+            out.print(json.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.print("{\"error\":\"Server Error\"}");
+        }
+    }
+}

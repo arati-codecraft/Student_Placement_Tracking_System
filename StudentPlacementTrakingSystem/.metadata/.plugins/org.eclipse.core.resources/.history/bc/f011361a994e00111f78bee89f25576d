@@ -1,0 +1,52 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import org.placepro.dao.UsersDao;
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.util.*;
+/**
+ * Servlet implementation class SearchUserServlet
+ */
+@WebServlet("/searchUsers")
+public class SearchUserServlet extends HttpServlet {
+    private UsersDao userDao = new UsersDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String course = req.getParameter("course");
+        String skill = req.getParameter("skill");
+        Double percentage = null;
+        if (req.getParameter("percentage") != null && !req.getParameter("percentage").isEmpty()) {
+            percentage = Double.parseDouble(req.getParameter("percentage"));
+        }
+
+        List<Users> users = userDao.searchUsers(course, percentage, skill);
+
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+        out.println("<html><body><h2>Search Results</h2><table border='1'>");
+        for (Users u : users) {
+            out.println("<tr><td>" + u.getName() + "</td><td>" + u.getEmail() + "</td><td>" + u.getCourse() + "</td><td>" + u.getPercentage() + "</td><td>" + u.getSkills() + "</td><td>" + u.getStatus() + "</td></tr>");
+        }
+        out.println("</table></body></html>");
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

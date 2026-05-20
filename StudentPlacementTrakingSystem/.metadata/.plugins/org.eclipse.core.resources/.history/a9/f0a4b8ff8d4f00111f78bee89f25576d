@@ -1,0 +1,64 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/studentDashboard")
+public class StudentDashboardServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        try {
+            HttpSession session = req.getSession(false);
+
+            if (session == null || session.getAttribute("userId") == null) {
+                resp.sendRedirect("login.html");
+                return;
+            }
+
+            int studentId = (int) session.getAttribute("userId");
+
+            Connection con = DBConnection.getConnection();
+
+            int companies = getCount(con, "SELECT COUNT(*) FROM company");
+
+            int applied = getCount(con,
+                    "SELECT COUNT(*) FROM placements WHERE student_id=" + studentId);
+
+            int selected = getCount(con,
+                    "SELECT COUNT(*) FROM placements WHERE student_id=" + studentId +
+                            " AND status='Selected'");
+
+            int interviews = getCount(con,
+                    "SELECT COUNT(*) FROM interview i JOIN placements p ON i.placement_id=p.id WHERE p.student_id=" + studentId);
+
+            req.setAttribute("companies", companies);
+            req.setAttribute("applied", applied);
+            req.setAttribute("selected", selected);
+            req.setAttribute("interviews", interviews);
+
+            // ✔ FIX PATH (must exist in webapp)
+            req.getRequestDispatcher("/student-dashboard.html")
+               .forward(req, resp);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            resp.sendRedirect("error.html");
+        }
+    }
+
+ 
+
+    private int getCount(Connection con, String sql) throws Exception {
+        ResultSet rs = con.createStatement().executeQuery(sql);
+        return rs.next() ? rs.getInt(1) : 0;
+    }
+}

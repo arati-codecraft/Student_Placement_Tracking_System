@@ -1,0 +1,74 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.PlacementDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/placementTracker")
+public class PlacementTrackerServlet extends HttpServlet {
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        List<Placement> placements = placementDao.getAllApplications();
+
+        out.println("<!DOCTYPE html><html lang='en'><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        out.println("<title>Placement Tracker</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("<link rel='stylesheet' href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css'>");
+        out.println("<link rel='stylesheet' href='CSS/Admin.css'>");
+        out.println("</head><body>");
+
+        // Sidebar + Header omitted for brevity...
+
+        out.println("<div class='main'>");
+        out.println("<div class='hero-banner'><h2>Placement Applications</h2><p>Track and update student placement statuses</p></div>");
+
+        out.println("<div class='table-card'><h5>Placement Applications</h5>");
+        out.println("<table class='table mt-3'>");
+        out.println("<thead><tr>"
+            + "<th>ID</th><th>Name</th><th>Email</th><th>Course</th><th>Education</th>"
+            + "<th>Company</th><th>Package</th><th>Status</th><th>Actions</th>"
+            + "</tr></thead><tbody>");
+
+        for (Placement p : placements) {
+            String badgeClass = "status-badge badge-applied";
+            if ("Selected".equalsIgnoreCase(p.getStatus())) badgeClass = "status-badge badge-selected";
+            else if ("Rejected".equalsIgnoreCase(p.getStatus())) badgeClass = "status-badge badge-rejected";
+
+            out.println("<tr>");
+            out.println("<td>" + p.getId() + "</td>");
+            out.println("<td>" + p.getStudentName() + "</td>");
+            out.println("<td>" + p.getEmail() + "</td>");
+            out.println("<td>" + p.getCourse() + "</td>");
+            out.println("<td>" + p.getEducation() + "</td>");
+            out.println("<td>" + p.getCompanyName() + "</td>");
+            out.println("<td>" + p.getPackageAmount() + "</td>");
+            out.println("<td><span class='" + badgeClass + "'>" + p.getStatus() + "</span></td>");
+            out.println("<td>"
+                + "<a class='btn btn-success btn-sm' href='updateApplicationStatus?appId=" + p.getId() + "&status=Selected'>Select</a> "
+                + "<a class='btn btn-danger btn-sm' href='updateApplicationStatus?appId=" + p.getId() + "&status=Rejected'>Reject</a>"
+                + "</td>");
+            out.println("</tr>");
+        }
+
+        out.println("</tbody></table></div></div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        doGet(req, resp);
+    }
+}

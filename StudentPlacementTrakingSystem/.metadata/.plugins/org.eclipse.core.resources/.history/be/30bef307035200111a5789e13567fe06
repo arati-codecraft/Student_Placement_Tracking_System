@@ -1,0 +1,106 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.daoImpl.PlacementDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Company;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/applyPlacement")
+public class ApplyPlacementServlet extends HttpServlet {
+
+    private ApplicationDao appDao = new ApplicationDaoImpl();
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    // =========================
+    // SHOW COMPANIES
+    // =========================
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        List<Company> companies = companyDao.getAllCompanies();
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("<!DOCTYPE html><html lang='en'><head>");
+        out.println("<meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        out.println("<title>Apply Placement</title>");
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+        out.println("</head><body>");
+
+        out.println("<div class='main'><h2>Available Companies</h2>");
+        out.println("<table class='applications-table'><tr><th>ID</th><th>Name</th><th>Location</th><th>Package</th><th>Action</th></tr>");
+
+        for (Company c : companies) {
+            out.println("<tr>");
+            out.println("<td>" + c.getId() + "</td>");
+            out.println("<td>" + c.getName() + "</td>");
+            out.println("<td>" + c.getLocation() + "</td>");
+            out.println("<td>" + c.getPackageAmount() + "</td>");
+            out.println("<td>");
+            out.println("<form method='post' action='applyPlacement'>");
+            out.println("<input type='hidden' name='companyId' value='" + c.getId() + "'>");
+            out.println("<button type='submit' class='btn-apply'>Apply</button>");
+            out.println("</form>");
+            out.println("</td>");
+            out.println("</tr>");
+        }
+
+        out.println("</table></div></body></html>");
+    }
+
+    // =========================
+    // APPLY COMPANY
+    // =========================
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        int companyId = Integer.parseInt(req.getParameter("companyId"));
+
+        Application app = new Application();
+        app.setStudentId(u.getId());
+        app.setCompanyId(companyId);
+        app.setApplyDate(LocalDate.now().toString());
+        app.setStatus("Applied");
+
+        boolean success = appDao.apply(app);
+
+        if (success) {
+            // ✅ Also insert into placements
+            PlacementDaoImpl placementDao = new PlacementDaoImpl();
+            placementDao.applyPlacement(u.getId(), companyId);
+
+            res.sendRedirect("applications");
+        } else {
+            res.getWriter().println("<h2>Application Failed</h2>");
+        }
+    }
+}

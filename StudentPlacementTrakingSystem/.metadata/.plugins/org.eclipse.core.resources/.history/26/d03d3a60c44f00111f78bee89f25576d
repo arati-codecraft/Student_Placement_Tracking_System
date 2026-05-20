@@ -1,0 +1,34 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+
+@WebServlet("/withdrawApplication")
+public class WithdrawApplicationServlet extends HttpServlet {
+    private ApplicationDao dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        int appId = Integer.parseInt(req.getParameter("appId"));
+        dao.delete(appId); // calls repository delete()
+
+        res.sendRedirect("applications"); // reload Applications page
+    }
+}
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

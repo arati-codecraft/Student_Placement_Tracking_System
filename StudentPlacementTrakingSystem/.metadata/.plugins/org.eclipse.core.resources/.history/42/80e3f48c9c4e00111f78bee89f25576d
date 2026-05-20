@@ -1,0 +1,60 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import org.placepro.dao.UsersDao;
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class UpdateUserServlet
+ */
+@WebServlet("/updateUser")
+public class UpdateUserServlet extends HttpServlet {
+    private UsersDao userDao = new UsersDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Users u = userDao.getStudentById(id);
+
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html><html><head><title>Edit Student</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("</head><body><div class='container mt-4'>");
+        out.println("<h2>Edit Student</h2>");
+        out.println("<form method='post' action='updateUser'>");
+        out.println("<input type='hidden' name='id' value='" + u.getId() + "'>");
+        out.println("Name: <input type='text' name='name' value='" + u.getName() + "' required><br>");
+        out.println("Email: <input type='email' name='email' value='" + u.getEmail() + "' required><br>");
+        out.println("Mobile: <input type='text' name='mobile' value='" + u.getMobile() + "'><br>");
+        out.println("Course: <input type='text' name='course' value='" + u.getCourse() + "'><br>");
+        out.println("CGPA: <input type='number' step='0.01' name='percentage' value='" + u.getPercentage() + "'><br>");
+        out.println("Skills: <input type='text' name='skills' value='" + u.getSkills() + "'><br>");
+        out.println("Status: <select name='status'>");
+        out.println("<option " + ("Not Placed".equals(u.getStatus()) ? "selected" : "") + ">Not Placed</option>");
+        out.println("<option " + ("Placed".equals(u.getStatus()) ? "selected" : "") + ">Placed</option>");
+        out.println("<option " + ("Intern".equals(u.getStatus()) ? "selected" : "") + ">Intern</option>");
+        out.println("</select><br>");
+        out.println("<button type='submit' class='btn btn-success mt-2'>Update</button>");
+        out.println("</form></div></body></html>");
+    }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

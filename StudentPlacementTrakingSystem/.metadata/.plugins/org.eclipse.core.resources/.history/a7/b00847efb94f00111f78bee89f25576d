@@ -1,0 +1,116 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.util.List;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+/**
+ * Servlet implementation class ApplicationsServlet
+ */
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+    private ApplicationDao dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        List<Application> apps = dao.getApplicationsByStudent(u.getId());
+
+        res.setContentType("text/html");
+        res.getWriter().println("<!DOCTYPE html><html lang='en'><head>");
+        res.getWriter().println("<meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        res.getWriter().println("<title>Applications</title>");
+        res.getWriter().println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+        res.getWriter().println("<style>");
+
+        // ✅ Reuse dashboard CSS
+        res.getWriter().println(":root{--primary:#7d3cff;--light:#b185ff;--bg:#f4f7fe;--white:#ffffff;--text:#333;--gray:#777;}");
+        res.getWriter().println("body{display:flex;background:var(--bg);min-height:100vh;font-family:'Segoe UI',sans-serif;}");
+        res.getWriter().println(".sidebar{width:240px;background:var(--primary);color:white;padding:30px 20px;display:flex;flex-direction:column;}");
+        res.getWriter().println(".logo{text-align:center;margin-bottom:40px;}.logo i{font-size:45px;margin-bottom:10px;}.logo h2{font-size:28px;}");
+        res.getWriter().println(".nav-links{flex:1;}.nav-item{display:flex;align-items:center;gap:12px;color:white;text-decoration:none;padding:14px 16px;margin-bottom:10px;border-radius:12px;transition:0.3s;font-weight:500;}");
+        res.getWriter().println(".nav-item:hover{background:white;color:var(--primary);} .active{background:white;color:var(--primary);}");
+        res.getWriter().println(".logout-btn{background:white;color:var(--primary);border:none;padding:14px;border-radius:12px;cursor:pointer;font-size:15px;font-weight:bold;transition:0.3s;} .logout-btn:hover{transform:translateY(-2px);}");
+        res.getWriter().println(".main{flex:1;padding:30px;}");
+        res.getWriter().println(".topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;}");
+        res.getWriter().println(".search-box{background:white;padding:12px 20px;border-radius:30px;width:320px;box-shadow:0 2px 10px rgba(0,0,0,0.05);} .search-box input{border:none;outline:none;width:100%;font-size:14px;}");
+        res.getWriter().println(".user-box{background:white;padding:8px 15px;border-radius:40px;display:flex;align-items:center;gap:10px;box-shadow:0 2px 10px rgba(0,0,0,0.05);} .avatar{width:40px;height:40px;border-radius:50%;background:var(--primary);color:white;display:flex;align-items:center;justify-content:center;font-weight:bold;}");
+        res.getWriter().println(".welcome-card{background:linear-gradient(135deg,var(--primary),var(--light));color:white;border-radius:30px;padding:40px;display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;} .welcome-card h3{font-size:18px;font-weight:400;margin-bottom:10px;} .welcome-card h1{font-size:42px;margin-bottom:10px;} .welcome-card p{font-size:16px;} .welcome-icon i{font-size:140px;opacity:0.8;}");
+
+        // ✅ Applications table styling
+        res.getWriter().println(".applications-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.05);} ");
+        res.getWriter().println(".applications-table th,.applications-table td{padding:12px 15px;text-align:left;border-bottom:1px solid #ddd;} ");
+        res.getWriter().println(".applications-table th{background:var(--primary);color:white;} ");
+        res.getWriter().println("</style></head><body>");
+
+        // Sidebar
+        res.getWriter().println("<div class='sidebar'>"
+            + "<div class='logo'><i class='fas fa-graduation-cap'></i><h2>PlacePro</h2></div>"
+            + "<div class='nav-links'>"
+            + "<a href='studentDashboard' class='nav-item'><i class='fas fa-th-large'></i>Dashboard</a>"
+            + "<a href='profile' class='nav-item'><i class='fas fa-user'></i>Profile</a>"
+            + "<a href='scheduleInterview' class='nav-item'><i class='fas fa-calendar-alt'></i>Interviews</a>"
+            + "<a href='applications' class='nav-item active'><i class='fas fa-file-alt'></i>Applications</a>"
+            + "<a href='applyPlacement' class='nav-item'><i class='fas fa-paper-plane'></i>Apply</a>"
+            + "<a href='coordinators' class='nav-item'><i class='fas fa-users'></i>Coordinators</a>"
+            + "</div>"
+            + "<button class='logout-btn'><i class='fas fa-sign-out-alt'></i>Logout</button>"
+            + "</div>");
+
+        // Main content
+        res.getWriter().println("<div class='main'>");
+
+        // Topbar
+        res.getWriter().println("<div class='topbar'>"
+            + "<div class='search-box'><input type='text' placeholder='Search here...'></div>"
+            + "<div class='user-box'><div class='avatar'>S</div><div><strong>" + u.getName() + "</strong><br><small>Student Panel</small></div></div>"
+            + "</div>");
+
+        // Welcome card
+        res.getWriter().println("<div class='welcome-card'>"
+            + "<div><h3>Applications Page</h3><h1>Welcome " + u.getName() + " 👋</h1><p>Here are your placement applications</p></div>"
+            + "<div class='welcome-icon'><i class='fas fa-file-alt'></i></div>"
+            + "</div>");
+
+        // Applications table
+        res.getWriter().println("<table class='applications-table'>");
+        res.getWriter().println("<tr><th>Company</th><th>Date</th><th>Status</th></tr>");
+        for (Application a : apps) {
+            res.getWriter().println("<tr>"
+                + "<td>" + a.getCompanyName() + "</td>"
+                + "<td>" + a.getApplyDate() + "</td>"
+                + "<td>" + a.getStatus() + "</td>"
+                + "</tr>");
+        }
+        res.getWriter().println("</table>");
+
+        res.getWriter().println("</div></body></html>");
+    }
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

@@ -1,0 +1,51 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.InterviewDao;
+import org.placepro.daoImpl.InterviewDaoImpl;
+import org.placepro.model.Interview;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class ScheduleInterviewServlet
+ */
+@WebServlet("/scheduleinterView")
+public class ScheduleInterviewServlet extends HttpServlet {
+
+    private InterviewDao dao = new InterviewDaoImpl();
+
+    @Override
+	protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        Interview i = new Interview();
+
+        i.setPlacementId(Integer.parseInt(req.getParameter("placement_id")));
+        i.setInterviewDate(req.getParameter("date"));
+        i.setInterviewTime(req.getParameter("time"));
+        i.setLocation(req.getParameter("location"));
+        i.setMode(req.getParameter("mode"));
+        i.setMeetingLink(req.getParameter("link"));
+
+        dao.scheduleInterview(i);
+
+        resp.sendRedirect("admindashboard");
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

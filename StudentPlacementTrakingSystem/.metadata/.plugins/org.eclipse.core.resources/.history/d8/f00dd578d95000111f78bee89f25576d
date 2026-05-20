@@ -1,0 +1,65 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+
+        if(session == null ||
+           session.getAttribute("user") == null){
+
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u =
+                (Users) session.getAttribute("user");
+
+        // GET COMPANY ID
+        int companyId =
+                Integer.parseInt(
+                        req.getParameter("companyId"));
+
+        // CREATE APPLICATION OBJECT
+        Application app = new Application();
+
+        app.setStudentId(u.getId());
+
+        app.setCompanyId(companyId);
+
+        app.setStatus("Pending");
+
+        // DAO
+        ApplicationDaoImpl dao =
+                new ApplicationDaoImpl();
+
+        boolean status = dao.apply(app);
+
+        if(status){
+
+            res.sendRedirect("applications");
+
+        }else{
+
+            res.getWriter().println(
+                    "<h2>Application Failed</h2>");
+        }
+    }
+}

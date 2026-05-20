@@ -1,0 +1,51 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+
+import com.google.gson.Gson;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+
+            AdminDao dao = new AdminDaoImpl();
+            Gson gson = new Gson();
+
+            // Create response object (clean way instead of string concat)
+            DashboardResponse res = new DashboardResponse();
+
+            res.setStudents(dao.totalStudents());
+            res.setCompanies(dao.totalCompanies());
+            res.setApplications(dao.totalApplications());
+            res.setSelected(dao.totalSelected());
+            res.setData(dao.getAllPlacements());
+
+            response.getWriter().write(gson.toJson(res));
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+            response.getWriter().write("{\"error\":\"Server Error\"}");
+        }
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+}

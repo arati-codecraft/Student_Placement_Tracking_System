@@ -1,0 +1,57 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.dao.CompanyDao;
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.daoImpl.PlacementDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+    private UsersLoginDao userDao = new UsersLoginDaoImpl();
+    private CompanyDao companyDao = new CompanyDaoImpl();
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+
+        int students = userDao.getAllUsers().size();
+        int companies = companyDao.getAllCompanies().size();
+        int applications = placementDao.getAllApplications().size();
+        long selected = placementDao.getAllApplications().stream()
+                .filter(p -> "Selected".equalsIgnoreCase(p.getStatus()))
+                .count();
+
+        var responseMap = new java.util.HashMap<String,Object>();
+        responseMap.put("students", students);
+        responseMap.put("companies", companies);
+        responseMap.put("applications", applications);
+        responseMap.put("selected", selected);
+        responseMap.put("data", placementDao.getAllApplications());
+
+        out.print(new com.google.gson.Gson().toJson(responseMap));
+        out.flush();
+    }
+
+
+
+
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+}

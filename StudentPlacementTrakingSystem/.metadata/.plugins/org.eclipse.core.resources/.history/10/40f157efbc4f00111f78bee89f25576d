@@ -1,0 +1,37 @@
+package org.placepro.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Servlet implementation class UpdateApplicationStatusServlet
+ */
+@WebServlet("/updateApplicationStatus")
+public class UpdateApplicationStatusServlet extends HttpServlet {
+    private ApplicationDao dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws ServletException, IOException {
+        int appId = Integer.parseInt(req.getParameter("appId"));
+        String status = req.getParameter("status");
+
+        dao.updateStatus(appId, status);
+
+        res.sendRedirect("applications"); // reload Applications page
+    }
+}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

@@ -1,0 +1,72 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import org.placepro.dao.UsersDao;
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/updateUser")
+public class UpdateUserServlet extends HttpServlet {
+    private UsersDao userDao = new UsersDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Users u = userDao.getUserById(id);
+
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        out.println("<!DOCTYPE html><html lang='en'><head>");
+        out.println("<meta charset='UTF-8'>");
+        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        out.println("<title>Edit User</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("<link rel='stylesheet' href='CSS/Admin.css'>"); // ✅ external CSS
+        out.println("</head><body>");
+
+        out.println("<div class='container mt-5'>");
+        out.println("<div class='form-card'>");
+        out.println("<h2 class='mb-4'>Edit User</h2>");
+        out.println("<form method='post' action='updateUser' class='row g-3'>");
+        out.println("<input type='hidden' name='id' value='" + u.getId() + "'>");
+
+        out.println("<div class='col-md-6'><label class='form-label'>Name</label><input type='text' name='name' class='form-control' value='" + u.getName() + "' required></div>");
+        out.println("<div class='col-md-6'><label class='form-label'>Email</label><input type='email' name='email' class='form-control' value='" + u.getEmail() + "' required></div>");
+        out.println("<div class='col-md-6'><label class='form-label'>Mobile</label><input type='text' name='mobile' class='form-control' value='" + u.getMobile() + "'></div>");
+        out.println("<div class='col-md-6'><label class='form-label'>Course</label><input type='text' name='course' class='form-control' value='" + u.getCourse() + "'></div>");
+
+        out.println("<div class='col-md-6'><label class='form-label'>Status</label><select name='status' class='form-select'>");
+        out.println("<option " + ("Selected".equals(u.getStatus()) ? "selected" : "") + ">Selected</option>");
+        out.println("<option " + ("Rejected".equals(u.getStatus()) ? "selected" : "") + ">Rejected</option>");
+        out.println("<option " + ("Applied".equals(u.getStatus()) ? "selected" : "") + ">Applied</option>");
+        out.println("</select></div>");
+
+        out.println("<div class='col-12'><button type='submit' class='btn btn-success w-100'>Update</button></div>");
+        out.println("</form></div></div>");
+
+        out.println("</body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Users u = userDao.getUserById(id);
+
+        u.setName(req.getParameter("name"));
+        u.setEmail(req.getParameter("email"));
+        u.setMobile(req.getParameter("mobile"));
+        u.setCourse(req.getParameter("course"));
+        u.setStatus(req.getParameter("status"));
+
+        userDao.updateUser(u);
+        resp.sendRedirect(req.getContextPath() + "/viewUsers");
+    }
+}

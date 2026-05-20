@@ -1,0 +1,69 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.daoImpl.PlacementDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/updatePlacementStatus")
+public class UpdatePlacementStatusServlet extends HttpServlet {
+    private PlacementDaoImpl placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        String idParam = req.getParameter("id");
+        String status = req.getParameter("status");
+
+        if (idParam != null && status != null) {
+            try (Connection con = DBConnection.getConnection()) {
+                int id = Integer.parseInt(idParam);
+
+                // 1. Update placements table
+                placementDao.updateStatus(id, status);
+
+                // 2. Update applications table as well
+                PreparedStatement psApp = con.prepareStatement(
+                    "UPDATE applications SET status=? WHERE id=?"
+                );
+                psApp.setString(1, status);
+                psApp.setInt(2, id);
+                psApp.executeUpdate();
+
+                // 3. Find student_id for notification
+                PreparedStatement ps1 = con.prepareStatement("SELECT student_id FROM placements WHERE id=?");
+                ps1.setInt(1, id);
+                ResultSet rs = ps1.executeQuery();
+
+                if (rs.next()) {
+                    int studentId = rs.getInt("student_id");
+
+                    // 4. Insert notification
+                    PreparedStatement ps2 = con.prepareStatement(
+                        "INSERT INTO notifications(student_id, message, status) VALUES (?, ?, 'Unread')"
+                    );
+                    ps2.setInt(1, studentId);
+                    ps2.setString(2, "Your application status is: " + status);
+                    ps2.executeUpdate();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                res.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Error updating placement status");
+                return;
+            }
+        }
+        dao.updateStatus(id, status);
+        // 5. Redirect back to placement tracker
+        res.sendRedirect("placementTracker");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        doGet(req, res);
+    }
+}

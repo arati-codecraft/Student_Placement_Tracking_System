@@ -1,0 +1,9 @@
+package org.placepro.dao;
+
+import org.placepro.model.Company;
+
+public interface CompanyDao {
+    void addCompany(Company company);
+    List<Company> getAllCompanies();
+    void deleteCompany(int id);
+}

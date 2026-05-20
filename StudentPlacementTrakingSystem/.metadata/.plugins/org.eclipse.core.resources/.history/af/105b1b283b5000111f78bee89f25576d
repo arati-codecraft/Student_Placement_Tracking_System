@@ -1,0 +1,81 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.PlacementDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/updatePlacementStatus")
+public class UpdatePlacementStatusServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    // ✅ DAO (for update)
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        try {
+
+            String idParam = req.getParameter("id");
+            String status = req.getParameter("status");
+
+            if (idParam != null && status != null) {
+
+                int id = Integer.parseInt(idParam);
+
+                // ✅ 1. UPDATE STATUS USING DAO
+                placementDao.updateStatus(id, status);
+
+                // ✅ 2. ADD NOTIFICATION (DIRECT DB)
+                Connection con = DBConnection.getConnection();
+
+                // get student id
+                PreparedStatement ps1 = con.prepareStatement(
+                        "SELECT student_id FROM placements WHERE id=?"
+                );
+                ps1.setInt(1, id);
+
+                ResultSet rs = ps1.executeQuery();
+
+                int studentId = 0;
+                if (rs.next()) {
+                    studentId = rs.getInt("student_id");
+                }
+
+                // insert notification
+                PreparedStatement ps2 = con.prepareStatement(
+                        "INSERT INTO notifications(student_id, message, status) VALUES (?, ?, 'Unread')"
+                );
+
+                ps2.setInt(1, studentId);
+                ps2.setString(2, "Your application status is: " + status);
+
+                ps2.executeUpdate();
+            }
+
+            // ✅ 3. REDIRECT (IMPORTANT FIX)
+            resp.sendRedirect(req.getContextPath() + "/admindashboard");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        // ✅ reuse same logic
+        doPost(req, resp);
+    }
+}

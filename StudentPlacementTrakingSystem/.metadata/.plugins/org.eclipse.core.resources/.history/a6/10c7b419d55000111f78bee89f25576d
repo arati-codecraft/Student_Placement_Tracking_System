@@ -1,0 +1,79 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.*;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/studentregistration")
+public class RegistrationServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        try {
+
+            String password = request.getParameter("password");
+            String confirmPassword = request.getParameter("confirmPassword");
+
+            if (!password.equals(confirmPassword)) {
+                response.sendRedirect("register.html?error=PasswordMismatch");
+                return;
+            }
+
+            // 🔹 Get form data
+            String name = request.getParameter("name");
+            String email = request.getParameter("email");
+            String mobile = request.getParameter("mobile");
+            String education =request.getParameter("education");
+            // ✅ FIXED COURSE PARAMETER
+            String course = request.getParameter("course");
+
+            String percentageStr = request.getParameter("percentage");
+            String skills = request.getParameter("skills");
+
+            double percentage = 0;
+            if (percentageStr != null && !percentageStr.isEmpty()) {
+                percentage = Double.parseDouble(percentageStr);
+            }
+
+            // 🔹 Create user
+            Users user = new Users();
+            user.setName(name);
+            user.setEmail(email);
+            user.setMobile(mobile);
+            user.setEducation(education);
+            user.setCourse(course); // ✅ SET COURSE
+            user.setPercentage(percentage);
+            user.setSkills(skills);
+            user.setPassword(password);
+            user.setRole("Student");
+
+            UsersLoginDao dao = new UsersLoginDaoImpl();
+            boolean result = dao.registerUser(user);
+
+            if (result) {
+                response.sendRedirect("login.html?success=Registered");
+            } else {
+                response.sendRedirect("register.html?error=Failed");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.sendRedirect("register.html?error=ServerError");
+        }
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        response.sendRedirect("register.html");
+    }
+}

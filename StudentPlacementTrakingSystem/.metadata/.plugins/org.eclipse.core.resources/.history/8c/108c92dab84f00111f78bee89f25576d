@@ -1,0 +1,50 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+import java.util.*;
+/**
+ * Servlet implementation class ApplicationsServlet
+ */
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        ApplicationsDaoImpl dao = new ApplicationsDaoImpl();
+        List<Application> apps = dao.getApplicationsByStudent(u.getId());
+
+        res.setContentType("text/html");
+        res.getWriter().println("<html><head><title>Applications</title></head><body>");
+        res.getWriter().println("<h2>Your Applications</h2>");
+        res.getWriter().println("<table border='1'><tr><th>Company</th><th>Date</th><th>Status</th></tr>");
+        for (Application a : apps) {
+            res.getWriter().println("<tr><td>" + a.getCompanyName() + "</td><td>" + a.getApplyDate() + "</td><td>" + a.getStatus() + "</td></tr>");
+        }
+        res.getWriter().println("</table></body></html>");
+    }
+}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

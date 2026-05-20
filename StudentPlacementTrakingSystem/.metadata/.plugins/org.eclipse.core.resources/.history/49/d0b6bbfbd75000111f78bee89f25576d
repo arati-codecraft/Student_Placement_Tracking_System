@@ -1,0 +1,241 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Application;
+import org.placepro.repository.ApplicationRepository;
+
+public class ApplicationRepositoryImpl implements ApplicationRepository {
+    @Override
+	 public boolean save(Application app){
+
+	        try{
+
+	            Connection con =
+	                    DBConnection.getConnection();
+
+	            // CHECK COMPANY EXISTS
+	            PreparedStatement check =
+	                    con.prepareStatement(
+	                            "SELECT id FROM companies WHERE id=?");
+
+	            check.setInt(1, app.getCompanyId());
+
+	            ResultSet rs = check.executeQuery();
+
+	            if(!rs.next()){
+
+	                System.out.println(
+	                        "Invalid Company ID");
+
+	                return false;
+	            }
+
+	            // INSERT APPLICATION
+	            PreparedStatement ps =
+	                    con.prepareStatement(
+	                    "INSERT INTO placements(student_id, company_id, status, apply_date) VALUES(?,?,?,NOW())");
+
+	            ps.setInt(1, app.getStudentId());
+
+	            ps.setInt(2, app.getCompanyId());
+
+	            ps.setString(3, app.getStatus());
+
+	            int i = ps.executeUpdate();
+
+	            return i > 0;
+
+	        }catch(Exception e){
+
+	            e.printStackTrace();
+	        }
+
+	        return false;
+	    }
+	
+    @Override
+    public List<Application> findByStudentId(int studentId){
+
+        List<Application> list =
+                new ArrayList<>();
+
+        try{
+
+            Connection con =
+                    DBConnection.getConnection();
+
+            String sql =
+            "SELECT p.id, " +
+            "c.company_name, " +
+            "c.location, " +
+            "c.package_amount, " +
+            "c.eligibility_criteria, " +
+            "p.apply_date, " +
+            "p.status " +
+            "FROM placements p " +
+            "JOIN companies c " +
+            "ON p.company_id = c.id " +
+            "WHERE p.student_id=?";
+
+            PreparedStatement ps =
+                    con.prepareStatement(sql);
+
+            ps.setInt(1, studentId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+
+                Application a =
+                        new Application();
+
+                a.setId(rs.getInt("id"));
+
+                a.setCompanyName(
+                        rs.getString("company_name"));
+
+                a.setLocation(
+                        rs.getString("location"));
+
+                a.setPackageAmount(
+                        rs.getDouble("package_amount"));
+
+                a.setEligibilityCriteria(
+                        rs.getString(
+                                "eligibility_criteria"));
+
+                a.setApplyDate(
+                        rs.getString("apply_date"));
+
+                a.setStatus(
+                        rs.getString("status"));
+
+                list.add(a);
+            }
+
+        }catch(Exception e){
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    @Override
+    public List<Application> findAll() {
+        List<Application> list = new ArrayList<>();
+        String sql = "SELECT a.id, a.student_id, a.company_id, a.apply_date, a.status, " +
+                "c.name AS companyName, c.location, c.packageAmount, c.eligibilityCriteria " +
+                "FROM applications a JOIN company c ON a.company_id = c.id";
+
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+            while (rs.next()) {
+                Application app = new Application();
+                app.setId(rs.getInt("id"));
+                app.setStudentId(rs.getInt("student_id"));
+                app.setCompanyId(rs.getInt("company_id"));
+                app.setApplyDate(rs.getString("apply_date"));
+                app.setStatus(rs.getString("status"));
+                app.setCompanyName(rs.getString("name"));
+                app.setLocation(rs.getString("location"));
+                app.setPackageAmount(rs.getDouble("packageAmount"));
+                app.setEligibilityCriteria(rs.getString("eligibilityCriteria"));
+                list.add(app);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    @Override
+    public void updateStatus(int id, String status) {
+        String sql = "UPDATE applications SET status=? WHERE id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public void delete(int id) {
+        String sql = "DELETE FROM applications WHERE id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public List<Application> getApplicationsByStudent(int studentId) {
+        List<Application> list = new ArrayList<>();
+        String sql = "SELECT a.id, a.apply_date, a.status, " +
+                     "c.name AS companyName, c.location, c.packageAmount, c.eligibilityCriteria " +
+                     "FROM applications a " +
+                     "JOIN company c ON a.company_id = c.id " +
+                     "WHERE a.student_id=?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                Application app = new Application();
+                app.setId(rs.getInt("id"));
+                app.setApplyDate(rs.getDate("apply_date").toString());
+                app.setStatus(rs.getString("status"));
+                app.setCompanyName(rs.getString("companyName"));
+                app.setLocation(rs.getString("location"));
+                app.setPackageAmount(rs.getDouble("packageAmount"));
+                app.setEligibilityCriteria(rs.getString("eligibilityCriteria"));
+                list.add(app);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+
+    public void apply(Application app) {
+        try (Connection con = DBConnection.getConnection()) {
+            // Insert into applications
+            PreparedStatement ps = con.prepareStatement(
+                "INSERT INTO applications(student_id, company_id, apply_date, status) VALUES (?,?,?,?)"
+            );
+            ps.setInt(1, app.getStudentId());
+            ps.setInt(2, app.getCompanyId());
+            ps.setDate(3, java.sql.Date.valueOf(app.getApplyDate()));
+            ps.setString(4, app.getStatus());
+            ps.executeUpdate();
+
+            // Also insert into placements
+            PreparedStatement ps2 = con.prepareStatement(
+                "INSERT INTO placements(student_id, company_id, apply_date, status) VALUES (?,?,?,?)"
+            );
+            ps2.setInt(1, app.getStudentId());
+            ps2.setInt(2, app.getCompanyId());
+            ps2.setDate(3, java.sql.Date.valueOf(app.getApplyDate()));
+            ps2.setString(4, app.getStatus());
+            ps2.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    }
+
+
+

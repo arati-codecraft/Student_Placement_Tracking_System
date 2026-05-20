@@ -1,0 +1,45 @@
+package org.placepro.daoImpl;
+
+import java.util.List;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.model.Application;
+import org.placepro.repository.ApplicationRepository;
+import org.placepro.repository.PlacementRepository;
+import org.placepro.repositoryImpl.ApplicationRepositoryImpl;
+import org.placepro.repositoryImpl.PlacementRepositoryImpl;
+
+public class ApplicationDaoImpl implements ApplicationDao {
+    private ApplicationRepository repo = new ApplicationRepositoryImpl();
+    private PlacementRepository placementRepo = new PlacementRepositoryImpl();
+    @Override
+    public boolean apply(Application app) {
+        // Save into applications
+        repo.save(app);
+
+        // Save into placements
+        placementRepo.save(
+            app.getStudentId(),
+            app.getCompanyId(),
+            app.getApplyDate(),
+            app.getStatus()
+        );
+    }
+
+    @Override
+    public List<Application> getApplicationsByStudent(int studentId) {
+        return repo.findByStudentId(studentId);
+    }
+
+    @Override
+    public void updateStatus(int appId, String status) {
+        repo.updateStatus(appId, status);
+    }
+
+    @Override
+    public void deleteApplication(int appId) {
+        repo.delete(appId);
+    }
+
+
+}

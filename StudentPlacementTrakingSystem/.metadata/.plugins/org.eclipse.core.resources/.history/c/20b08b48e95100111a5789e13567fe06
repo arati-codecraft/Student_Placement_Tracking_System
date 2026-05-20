@@ -1,0 +1,105 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Application;
+import org.placepro.repository.ApplicationRepository;
+
+public class ApplicationRepositoryImpl implements ApplicationRepository {
+
+    @Override
+    public boolean save(Application app) {
+        String sql = "INSERT INTO applications(student_id, company_id, apply_date, status) VALUES (?, ?, ?, ?)";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, app.getStudentId());
+            ps.setInt(2, app.getCompanyId());
+            ps.setDate(3, java.sql.Date.valueOf(app.getApplyDate()));
+            ps.setString(4, app.getStatus());
+            int i = ps.executeUpdate();
+            return i > 0;   // ✅ success
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;   // ✅ failure
+        }
+    }
+
+    @Override
+    public List<Application> findByStudentId(int studentId) {
+        List<Application> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "SELECT a.id, a.company_id, a.apply_date, a.status, c.name, c.location, c.packageAmount, c.eligibilityCriteria " +
+                 "FROM applications a JOIN company c ON a.company_id = c.id WHERE a.student_id=?")) {
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Application a = new Application();
+                a.setId(rs.getInt("id"));
+                a.setCompanyId(rs.getInt("company_id"));
+                a.setApplyDate(rs.getString("apply_date"));
+                a.setStatus(rs.getString("status"));
+                a.setCompanyName(rs.getString("name"));
+                a.setLocation(rs.getString("location"));
+                a.setPackageAmount(rs.getDouble("packageAmount"));
+                a.setEligibilityCriteria(rs.getString("eligibilityCriteria"));
+                list.add(a);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public List<Application> findAll() {
+        List<Application> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+                 "SELECT a.id, a.student_id, a.company_id, a.apply_date, a.status, c.name, c.location, c.packageAmount, c.eligibilityCriteria " +
+                 "FROM applications a JOIN company c ON a.company_id = c.id");
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                Application app = new Application();
+                app.setId(rs.getInt("id"));
+                app.setStudentId(rs.getInt("student_id"));
+                app.setCompanyId(rs.getInt("company_id"));
+                app.setApplyDate(rs.getString("apply_date"));
+                app.setStatus(rs.getString("status"));
+                app.setCompanyName(rs.getString("name"));
+                app.setLocation(rs.getString("location"));
+                app.setPackageAmount(rs.getDouble("packageAmount"));
+                app.setEligibilityCriteria(rs.getString("eligibilityCriteria"));
+                list.add(app);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    @Override
+    public void updateStatus(int id, String status) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement("UPDATE applications SET status=? WHERE id=?")) {
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement("DELETE FROM applications WHERE id=?")) {
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Modern Student Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+body{
+    background:linear-gradient(135deg,#d8c7f3,#c4b5fd,#e9d5ff);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:25px;
+    overflow-x:hidden;
+}
+
+/* ================= MAIN CONTAINER ================= */
+
+.dashboard{
+    width:1400px;
+    min-height:850px;
+    background:rgba(255,255,255,0.75);
+    backdrop-filter:blur(20px);
+    border-radius:40px;
+    padding:25px;
+    display:flex;
+    gap:30px;
+    box-shadow:
+    0 25px 70px rgba(0,0,0,0.15),
+    inset 0 1px 1px rgba(255,255,255,0.4);
+    border:1px solid rgba(255,255,255,0.3);
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:240px;
+    background:linear-gradient(180deg,#9d4edd,#7b2cbf);
+    border-radius:32px;
+    padding:25px;
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    box-shadow:0 15px 40px rgba(123,44,191,0.35);
+}
+
+.logo-box{
+    width:130px;
+    height:130px;
+    background:rgba(255,255,255,0.18);
+    border-radius:35px;
+    margin:auto;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:55px;
+    box-shadow:0 10px 30px rgba(255,255,255,0.15);
+}
+
+.logo-box i{
+    font-size:60px;
+    color:white;
+}
+
+.menu{
+    display:flex;
+    flex-direction:column;
+    gap:18px;
+}
+
+.menu a{
+    text-decoration:none;
+    color:#efe6ff;
+    display:flex;
+    align-items:center;
+    gap:15px;
+    padding:15px 20px;
+    border-radius:18px;
+    transition:0.35s;
+    font-size:17px;
+}
+
+.menu a:hover,
+.menu .active{
+    background:white;
+    color:#7b2cbf;
+    font-weight:600;
+    transform:translateX(6px);
+    box-shadow:0 10px 25px rgba(255,255,255,0.25);
+}
+
+/* ================= LOGOUT BUTTON ================= */
+
+.logout-btn{
+    width:100%;
+    text-decoration:none;
+    background:white;
+    color:#7b2cbf;
+    padding:15px 20px;
+    border-radius:18px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    font-size:17px;
+    font-weight:600;
+    transition:0.3s;
+}
+
+.logout-btn:hover{
+    background:#f3e8ff;
+    transform:translateY(-3px);
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    flex:1;
+}
+
+/* ================= TOPBAR ================= */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+}
+
+.search-box{
+    width:380px;
+    background:white;
+    border-radius:50px;
+    padding:15px 22px;
+    display:flex;
+    align-items:center;
+    box-shadow:0 8px 25px rgba(0,0,0,0.08);
+}
+
+.search-box input{
+    width:100%;
+    border:none;
+    outline:none;
+    background:none;
+    font-size:15px;
+}
+
+/* ================= PROFILE ================= */
+
+.profile{
+    display:flex;
+    align-items:center;
+    gap:15px;
+    background:white;
+    padding:10px 18px;
+    border-radius:50px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.08);
+}
+
+.profile img{
+    width:60px;
+    height:60px;
+    border-radius:50%;
+    border:4px solid #8b5cf6;
+    object-fit:cover;
+    background:#ececec;
+}
+
+.profile img[src=""]{
+    background:#e9d5ff;
+    padding:12px;
+}
+
+.profile-text h3{
+    font-size:19px;
+}
+
+.profile-text p{
+    color:#777;
+}
+
+/* ================= BANNER ================= */
+
+.banner{
+    height:250px;
+    background:linear-gradient(135deg,#8b5cf6,#c084fc);
+    border-radius:35px;
+    padding:40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    overflow:hidden;
+    position:relative;
+    box-shadow:0 15px 40px rgba(139,92,246,0.35);
+}
+
+.banner::before{
+    content:"";
+    position:absolute;
+    width:220px;
+    height:220px;
+    background:rgba(255,255,255,0.15);
+    border-radius:50%;
+    top:-60px;
+    right:220px;
+}
+
+.banner::after{
+    content:"";
+    position:absolute;
+    width:140px;
+    height:140px;
+    background:rgba(255,255,255,0.12);
+    border-radius:50%;
+    bottom:-40px;
+    left:120px;
+}
+
+.banner-text{
+    color:white;
+    z-index:2;
+}
+
+.banner-text span{
+    font-size:17px;
+    opacity:0.9;
+}
+
+.banner-text h1{
+    font-size:52px;
+    margin-top:20px;
+    margin-bottom:12px;
+    font-weight:700;
+}
+
+.banner-text p{
+    font-size:17px;
+}
+
+.banner img{
+    width:320px;
+    max-width:100%;
+    object-fit:contain;
+    z-index:2;
+    animation:float 3s ease-in-out infinite;
+}
+
+@keyframes float{
+
+0%{
+    transform:translateY(0px);
+}
+
+50%{
+    transform:translateY(-12px);
+}
+
+100%{
+    transform:translateY(0px);
+}
+
+}
+
+/* ================= CONTENT ================= */
+
+.content{
+    display:flex;
+    gap:30px;
+    margin-top:30px;
+}
+
+.left{
+    flex:1;
+}
+
+/* ================= SECTION TITLE ================= */
+
+.section-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:22px;
+}
+
+.section-title h2{
+    font-size:32px;
+    color:#3b0764;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:22px;
+}
+
+.stat-card{
+    background:white;
+    border-radius:28px;
+    padding:35px;
+    text-align:center;
+    transition:0.35s;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+    position:relative;
+    overflow:hidden;
+}
+
+.stat-card::before{
+    content:"";
+    position:absolute;
+    width:100px;
+    height:100px;
+    background:#f3e8ff;
+    border-radius:50%;
+    top:-40px;
+    right:-30px;
+}
+
+.stat-card:hover{
+    transform:translateY(-10px);
+}
+
+.stat-card i{
+    font-size:50px;
+    color:#8b5cf6;
+    margin-bottom:22px;
+}
+
+.stat-card h1{
+    font-size:42px;
+    margin-bottom:10px;
+    color:#3b0764;
+}
+
+.stat-card p{
+    color:#777;
+    font-size:16px;
+}
+
+/* ================= STATUS ================= */
+
+.course-grid{
+    margin-top:30px;
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:22px;
+}
+
+.course-card{
+    background:linear-gradient(135deg,#f3e8ff,#e9d5ff);
+    border-radius:28px;
+    padding:28px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    transition:0.35s;
+    box-shadow:0 10px 25px rgba(0,0,0,0.07);
+}
+
+.course-card:hover{
+    transform:scale(1.03);
+}
+
+.course-card h3{
+    color:#6b21a8;
+    font-size:24px;
+    margin-bottom:22px;
+}
+
+.course-card button{
+    padding:12px 30px;
+    border:none;
+    border-radius:30px;
+    background:linear-gradient(135deg,#8b5cf6,#7c3aed);
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    box-shadow:0 10px 20px rgba(139,92,246,0.3);
+}
+
+.course-card i{
+    font-size:75px;
+    color:#a855f7;
+}
+
+/* ================= RIGHT ================= */
+
+.right{
+    width:320px;
+}
+
+/* ================= COORDINATORS ================= */
+
+.teacher-box{
+    background:white;
+    border-radius:28px;
+    padding:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.teacher-box h2{
+    margin-bottom:25px;
+    color:#3b0764;
+}
+
+.teacher-list{
+    display:flex;
+    justify-content:center;
+    gap:22px;
+}
+
+.teacher-list img{
+    width:85px;
+    height:85px;
+    border-radius:50%;
+    border:5px solid #8b5cf6;
+    transition:0.3s;
+    object-fit:cover;
+}
+
+.teacher-list img:hover{
+    transform:scale(1.1);
+}
+
+/* ================= NOTICE ================= */
+
+.notice-box{
+    margin-top:25px;
+    background:white;
+    border-radius:28px;
+    padding:28px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.08);
+}
+
+.notice-box h2{
+    margin-bottom:25px;
+    color:#3b0764;
+}
+
+.notice{
+    margin-bottom:28px;
+    padding-bottom:20px;
+    border-bottom:1px solid #eee;
+}
+
+.notice:last-child{
+    border:none;
+}
+
+.notice h3{
+    margin-bottom:12px;
+    color:#581c87;
+}
+
+.notice p{
+    color:#777;
+    line-height:1.7;
+    margin-bottom:12px;
+}
+
+.notice a{
+    color:#8b5cf6;
+    text-decoration:none;
+    font-weight:600;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1200px){
+
+.dashboard{
+    width:100%;
+    flex-direction:column;
+}
+
+.sidebar{
+    width:100%;
+}
+
+.content{
+    flex-direction:column;
+}
+
+.right{
+    width:100%;
+}
+
+.stats{
+    grid-template-columns:repeat(2,1fr);
+}
+
+.course-grid{
+    grid-template-columns:1fr;
+}
+
+.banner{
+    flex-direction:column;
+    height:auto;
+    text-align:center;
+    gap:25px;
+}
+
+.banner-text h1{
+    font-size:42px;
+}
+
+.banner img{
+    width:250px;
+}
+
+}
+
+@media(max-width:768px){
+
+body{
+    padding:15px;
+}
+
+.dashboard{
+    padding:15px;
+    border-radius:25px;
+}
+
+.sidebar{
+    padding:20px;
+}
+
+.logo-box{
+    width:90px;
+    height:90px;
+    margin-bottom:30px;
+}
+
+.logo-box i{
+    font-size:40px;
+}
+
+.menu{
+    gap:12px;
+}
+
+.menu a{
+    font-size:15px;
+    padding:12px 15px;
+}
+
+.topbar{
+    flex-direction:column;
+    gap:20px;
+    align-items:flex-start;
+}
+
+.search-box{
+    width:100%;
+}
+
+.profile{
+    width:100%;
+    justify-content:center;
+}
+
+.banner{
+    padding:25px;
+}
+
+.banner-text h1{
+    font-size:32px;
+}
+
+.banner-text p{
+    font-size:15px;
+}
+
+.banner img{
+    width:200px;
+}
+
+.stats{
+    grid-template-columns:1fr;
+}
+
+.stat-card{
+    padding:25px;
+}
+
+.course-card{
+    flex-direction:column;
+    text-align:center;
+    gap:20px;
+}
+
+.course-card h3{
+    font-size:22px;
+}
+
+.teacher-list{
+    justify-content:center;
+}
+
+.teacher-list img{
+    width:70px;
+    height:70px;
+}
+
+.notice-box,
+.teacher-box{
+    padding:22px;
+}
+
+.logout-btn{
+    font-size:15px;
+}
+
+}
+
+@media(max-width:500px){
+
+.banner-text h1{
+    font-size:26px;
+}
+
+.section-title h2{
+    font-size:24px;
+}
+
+.stat-card h1{
+    font-size:34px;
+}
+
+.course-card h3{
+    font-size:18px;
+}
+
+.profile-text h3{
+    font-size:16px;
+}
+
+.profile-text p{
+    font-size:13px;
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- SIDEBAR -->
+
+    <div class="sidebar">
+
+        <div>
+
+            <div class="logo-box">
+
+                <i class="fa-solid fa-graduation-cap"></i>
+
+            </div>
+
+            <div class="menu">
+
+                <a href="#" class="active">
+
+                    <i class="fa-solid fa-table-columns"></i>
+                    Dashboard
+
+                </a>
+
+                <a href="#">
+
+                    <i class="fa-solid fa-user"></i>
+                    Profile
+
+                </a>
+
+                <a href="#">
+
+                    <i class="fa-solid fa-building"></i>
+                    Companies
+
+                </a>
+
+                <a href="#">
+
+                    <i class="fa-solid fa-file-lines"></i>
+                    Applications
+
+                </a>
+
+                <a href="#">
+
+                    <i class="fa-solid fa-calendar"></i>
+                    Interviews
+
+                </a>
+
+            </div>
+
+        </div>
+
+        <!-- LOGOUT -->
+
+        <a href="../WEB-INF/PlacePro.html" class="logout-btn">
+
+            <i class="fa-solid fa-right-from-bracket"></i>
+
+            Logout
+
+        </a>
+
+    </div>
+
+    <!-- MAIN -->
+
+    <div class="main">
+
+        <!-- TOPBAR -->
+
+        <div class="topbar">
+
+            <div class="search-box">
+
+                <input type="text"
+                placeholder="Search">
+
+            </div>
+
+            <!-- PROFILE -->
+
+            <div class="profile">
+
+                <!-- Empty image initially -->
+                <img src="" id="studentImage" alt="Student Image">
+
+                <div class="profile-text">
+
+                    <h3>Rutuja</h3>
+                    <p>Student</p>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- BANNER -->
+
+        <div class="banner">
+
+            <div class="banner-text">
+
+                <span>Student Dashboard</span>
+
+                <h1>Welcome Back 👋</h1>
+
+                <p>
+                    Manage your placements and applications
+                </p>
+
+            </div>
+
+            <!-- Student image can come here after registration -->
+            <img src="" id="bannerStudentImage">
+
+        </div>
+
+        <!-- CONTENT -->
+
+        <div class="content">
+
+            <!-- LEFT -->
+
+            <div class="left">
+
+                <div class="section-title">
+
+                    <h2>Analytics</h2>
+
+                </div>
+
+                <div class="stats">
+
+                    <div class="stat-card">
+
+                        <i class="fa-solid fa-building"></i>
+
+                        <h1>0</h1>
+
+                        <p>Total Companies</p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <i class="fa-solid fa-paper-plane"></i>
+
+                        <h1>0</h1>
+
+                        <p>Applications</p>
+
+                    </div>
+
+                    <div class="stat-card">
+
+                        <i class="fa-solid fa-circle-check"></i>
+
+                        <h1>0</h1>
+
+                        <p>Selected</p>
+
+                    </div>
+
+                </div>
+
+                <!-- STATUS -->
+
+                <div class="section-title"
+                style="margin-top:35px;">
+
+                    <h2>Placement Status</h2>
+
+                </div>
+
+                <div class="course-grid">
+
+                    <div class="course-card">
+
+                        <div>
+
+                            <h3>
+                                No Companies Added
+                            </h3>
+
+                            <button>
+                                Waiting
+                            </button>
+
+                        </div>
+
+                        <i class="fa-solid fa-building"></i>
+
+                    </div>
+
+                    <div class="course-card">
+
+                        <div>
+
+                            <h3>
+                                No Interviews Scheduled
+                            </h3>
+
+                            <button>
+                                Pending
+                            </button>
+
+                        </div>
+
+                        <i class="fa-solid fa-calendar-check"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RIGHT -->
+
+            <div class="right">
+
+                <div class="teacher-box">
+
+                    <h2>
+                        Coordinators
+                    </h2>
+
+                    <div class="teacher-list">
+
+                        <img src="https://randomuser.me/api/portraits/women/44.jpg">
+
+                        <img src="https://randomuser.me/api/portraits/men/32.jpg">
+
+                    </div>
+
+                </div>
+
+                <div class="notice-box">
+
+                    <h2>
+                        Notifications
+                    </h2>
+
+                    <div class="notice">
+
+                        <h3>
+                            No New Notifications
+                        </h3>
+
+                        <p>
+                            Notifications added by admin will appear here.
+                        </p>
+
+                        <a href="#">
+                            View More
+                        </a>
+
+                    </div>
+
+                    <div class="notice">
+
+                        <h3>
+                            Placement Updates
+                        </h3>
+
+                        <p>
+                            Upcoming company updates will display here.
+                        </p>
+
+                        <a href="#">
+                            View More
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

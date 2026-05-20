@@ -1,0 +1,16 @@
+package org.placepro.model;
+import java.sql.Date;
+
+import lombok.*;
+
+
+@Setter
+@Getter
+public class Placement {
+	private int id;
+    private int studentId;
+    private int companyId;
+    private Date applyDate;
+    private String status;
+
+}

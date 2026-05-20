@@ -1,0 +1,60 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    private AdminDao dao = new AdminDaoImpl();
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        resp.setContentType("application/json");
+        PrintWriter out = resp.getWriter();
+
+        int students = dao.totalStudents();
+        int companies = dao.totalCompanies();
+        int applications = dao.totalApplications();
+        int selected = dao.totalSelected();
+
+        List<Placement> list = dao.getAllPlacements();
+
+        StringBuilder json = new StringBuilder();
+        json.append("{");
+        json.append("\"students\":").append(students).append(",");
+        json.append("\"companies\":").append(companies).append(",");
+        json.append("\"applications\":").append(applications).append(",");
+        json.append("\"selected\":").append(selected).append(",");
+        json.append("\"data\":[");
+
+        for (int i = 0; i < list.size(); i++) {
+            Placement p = list.get(i);
+
+            json.append("{")
+                .append("\"id\":").append(p.getId()).append(",")
+                .append("\"studentName\":\"").append(p.getStudentName()).append("\",")
+                .append("\"email\":\"").append(p.getEmail()).append("\",")
+                .append("\"course\":\"").append(p.getCourse()).append("\",")
+                .append("\"education\":\"").append(p.getEducation()).append("\",")
+                .append("\"companyName\":\"").append(p.getCompanyName()).append("\",")
+                .append("\"packageAmount\":").append(p.getPackageAmount()).append(",")
+                .append("\"status\":\"").append(p.getStatus()).append("\"")
+                .append("}");
+
+            if (i < list.size() - 1) json.append(",");
+        }
+
+        json.append("]}");
+
+        out.print(json.toString());
+    }
+}

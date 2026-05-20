@@ -1,0 +1,80 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.dao.CompanyDao;
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.UsersLoginDaoImpl;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.daoImpl.PlacementDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+    private UsersLoginDao userDao = new UsersLoginDaoImpl();
+    private CompanyDao companyDao = new CompanyDaoImpl();
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        int students = userDao.getAllUsers().size();
+        int companies = companyDao.getAllCompanies().size();
+        int applications = placementDao.getAllApplications().size();
+        long selected = placementDao.getAllApplications().stream()
+                .filter(p -> "Selected".equalsIgnoreCase(p.getStatus()))
+                .count();
+
+        List<Placement> apps = placementDao.getAllApplications();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head><title>Admin Dashboard</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("</head><body>");
+
+        out.println("<div class='container mt-4'>");
+        out.println("<h2>Admin Dashboard</h2>");
+        out.println("<p>Welcome, Admin 👋</p>");
+
+        // Stats
+        out.println("<div class='row mb-4'>");
+        out.println("<div class='col-md-3'><div class='card'><div class='card-body'>Total Students: " + students + "</div></div></div>");
+        out.println("<div class='col-md-3'><div class='card'><div class='card-body'>Total Companies: " + companies + "</div></div></div>");
+        out.println("<div class='col-md-3'><div class='card'><div class='card-body'>Applications: " + applications + "</div></div></div>");
+        out.println("<div class='col-md-3'><div class='card'><div class='card-body'>Selected Students: " + selected + "</div></div></div>");
+        out.println("</div>");
+
+        // Placement Table
+        out.println("<h4>Placement Applications</h4>");
+        out.println("<table class='table table-bordered'>");
+        out.println("<thead><tr><th>Student</th><th>Company</th><th>Package</th><th>Status</th></tr></thead>");
+        out.println("<tbody>");
+        for (Placement p : apps) {
+            out.println("<tr>");
+            out.println("<td>" + p.getStudentName() + "</td>");
+            out.println("<td>" + p.getCompanyName() + "</td>");
+            out.println("<td>" + p.getPackageAmount() + "</td>");
+            out.println("<td>" + p.getStatus() + "</td>");
+            out.println("</tr>");
+        }
+        out.println("</tbody></table>");
+
+        out.println("</div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+}

@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<title>
+PlacePro - Placement Tracking System
+</title>
+
+<link rel="stylesheet" href="CSS/placepro.css">
+
+</head>
+
+<body>
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar">
+
+<div class="logo-section">
+
+<img src="images/Logo.png" class="logo-img">
+
+</div>
+
+<ul class="menu">
+
+<li><a href="#home">Home</a></li>
+
+<li><a href="#about">About</a></li>
+
+<li><a href="#services">Services</a></li>
+
+<li>
+<a href="javascript:void(0)"
+onclick="openJobs()">
+Jobs
+</a>
+</li>
+
+<li><a href="#contact">Contact</a></li>
+
+</ul>
+
+<div class="buttons">
+
+<button class="login-btn"
+onclick="showSection('login')">
+<a href="login.html" class="login-btn">
+    SIGN IN
+</a>
+
+</button>
+
+
+</div>
+
+</nav>
+
+<!-- ================= HERO SECTION ================= -->
+
+<section id="home" class="hero">
+
+<h1>BUILD YOUR CAREER</h1>
+
+<h2>SHAPE YOUR FUTURE</h2>
+
+<p>
+Empowering Students,
+Connecting Opportunities,
+Creating Successful Careers.
+</p>
+
+<button class="start-btn"
+onclick="showSection('register')">
+
+YOUR CAREER...OUR MISSION
+
+</button>
+
+</section>
+
+<!-- ================= ABOUT ================= -->
+
+<section class="about" id="about">
+
+<div class="about-text">
+
+<h2>About Our Institute</h2>
+
+<p>
+
+Our institute provides excellent placement opportunities
+for students through top IT companies.
+
+We help students build strong skills in:
+Java, Web Development, SQL, React, Aptitude,
+and Interview Preparation.
+
+PlacePro helps students track placement activities,
+job applications, and placement status online easily.<br>
+
+he platform also helps administrators efficiently manage student records, company details, placement drives, and recruitment activities.
+Admins can add companies, update placement statuses, monitor applications, and generate placement reports with ease.
+PlacePro improves communication between students and placement coordinators while reducing paperwork and manual errors.
+
+</p>
+
+</div>
+
+<div class="about-image">
+
+<img src="/About.png">
+
+</div>
+
+</section>
+
+<!-- ================= SERVICES ================= -->
+
+<section class="services" id="services">
+
+<h2>Our Services</h2>
+
+<div class="service-container">
+
+<div class="service-card">
+
+<h3>🎓 Student Management</h3>
+
+<p>
+Manage student profiles and placement records.
+</p>
+
+</div>
+
+<div class="service-card">
+
+<h3>🏢 Company Management</h3>
+
+<p>
+Manage companies and placement drives.
+</p>
+
+</div>
+
+<div class="service-card">
+
+<h3>📊 Placement Tracking</h3>
+
+<p>
+Track student placement status online.
+</p>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- ================= JOBS ================= -->
+
+<section class="jobs">
+
+<h2>Latest Jobs</h2>
+
+<div class="job-container">
+
+<div class="job-card">
+
+<h3>TCS</h3>
+
+<p>Package : 4 LPA</p>
+
+<p>Location : Pune</p>
+
+<button onclick="openJobs()">
+
+Apply Now
+
+</button>
+
+</div>
+
+<div class="job-card">
+
+<h3>Infosys</h3>
+
+<p>Package : 5 LPA</p>
+
+<p>Location : Mumbai</p>
+
+<button onclick="openJobs()">
+
+Apply Now
+
+</button>
+
+</div>
+
+<div class="job-card">
+
+<h3>Wipro</h3>
+
+<p>Package : 3.5 LPA</p>
+
+<p>Location : Bangalore</p>
+
+<button onclick="openJobs()">
+
+Apply Now
+
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+
+
+<!-- ================= CONTACT ================= -->
+
+<section class="contact" id="contact">
+
+<h2>Contact Us</h2>
+
+<p>📍 Pune, Maharashtra</p>
+
+<p>📧 placepro@gmail.com</p>
+
+<p>📞 +91 9579550316</p>
+
+</section>
+
+<!-- ================= FOOTER ================= -->
+
+<footer>
+
+© 2026 PlacePro Placement Tracking System
+
+</footer>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>

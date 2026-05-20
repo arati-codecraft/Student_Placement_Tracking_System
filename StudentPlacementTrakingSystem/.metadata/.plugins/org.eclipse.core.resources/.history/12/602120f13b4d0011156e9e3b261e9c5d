@@ -1,0 +1,9 @@
+package org.placepro.dao;
+
+import org.placepro.model.Student;
+
+public interface StudentDao
+{
+	public boolean registerStudent(Student s); 
+
+}

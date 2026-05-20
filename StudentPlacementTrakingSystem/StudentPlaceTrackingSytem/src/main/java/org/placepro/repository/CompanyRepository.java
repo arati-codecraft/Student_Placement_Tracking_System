@@ -1,0 +1,14 @@
+package org.placepro.repository;
+
+import java.util.List;
+
+import org.placepro.model.Company;
+
+public interface CompanyRepository {
+    void save(Company company);
+    void update(Company company);
+    void delete(int id);
+    List<Company> findAllCompanies();
+    Company findById(int id);
+    int countCompanies();
+}

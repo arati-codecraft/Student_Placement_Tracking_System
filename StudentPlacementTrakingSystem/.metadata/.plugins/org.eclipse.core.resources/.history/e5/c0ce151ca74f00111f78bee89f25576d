@@ -1,0 +1,188 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Interview;
+import org.placepro.repository.InterviewRepository;
+
+public class InterviewRepositoryImpl implements InterviewRepository {
+
+    @Override
+    public void scheduleInterview(Interview i) {
+
+        String sql = "INSERT INTO interview " +
+                     "(placement_id, interview_date, interview_time, location, mode, meeting_link, status) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, i.getPlacementId());
+            ps.setString(2, i.getInterviewDate());
+            ps.setString(3, i.getInterviewTime());
+            ps.setString(4, i.getLocation());
+            ps.setString(5, i.getMode());
+            ps.setString(6, i.getMeetingLink());
+
+            // default status
+            ps.setString(7, "Scheduled");
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Interview> getStudentInterviews(int studentId) {
+
+        List<Interview> list = new ArrayList<>();
+
+        String sql =
+            "SELECT i.*, c.name AS companyName " +
+            "FROM interview i " +
+            "JOIN placements p ON i.placement_id = p.id " +
+            "JOIN company c ON p.company_id = c.id " +
+            "WHERE p.student_id=?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+
+                while (rs.next()) {
+
+                    Interview i = new Interview();
+
+                    i.setId(rs.getInt("id"));
+                    i.setPlacementId(rs.getInt("placement_id"));
+                    i.setInterviewDate(rs.getString("interview_date"));
+                    i.setInterviewTime(rs.getString("interview_time"));
+                    i.setLocation(rs.getString("location"));
+                    i.setMode(rs.getString("mode"));
+                    i.setMeetingLink(rs.getString("meeting_link"));
+                    i.setStatus(rs.getString("status"));
+                    i.setCompanyName(rs.getString("companyName"));
+
+                    list.add(i);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+    @Override
+    public int countInterviews(int studentId) {
+
+        String sql =
+            "SELECT COUNT(*) FROM interview i " +
+            "JOIN placements p ON i.placement_id = p.id " +
+            "WHERE p.student_id=?";
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+
+            ps.setInt(1, studentId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
+
+    @Override
+    public void save(Interview interview) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "INSERT INTO interviews(student_id, company, date, time, location, status) VALUES(?,?,?,?,?,?)";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, interview.getId());
+            ps.setString(2, interview.getCompanyName());
+            ps.setDate(3, Date.valueOf(interview.getDate())); // assuming LocalDate
+            ps.setString(4, interview.getTime());
+            ps.setString(5, interview.getLocation());
+            ps.setString(6, interview.getStatus());
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public List<Interview> findByStudentId(int studentId) {
+        List<Interview> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "SELECT * FROM interviews WHERE student_id=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                list.add(mapInterview(rs));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    @Override
+    public List<Interview> findAll() {
+        List<Interview> list = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery("SELECT * FROM interviews")) {
+            while (rs.next()) {
+                list.add(mapInterview(rs));
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+        return list;
+    }
+
+    @Override
+    public void updateStatus(int id, String status) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "UPDATE interviews SET status=? WHERE id=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setString(1, status);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    @Override
+    public void delete(int id) {
+        try (Connection con = DBConnection.getConnection()) {
+            String sql = "DELETE FROM interviews WHERE id=?";
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, id);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    private Interview mapInterview(ResultSet rs) throws SQLException {
+        Interview i = new Interview();
+        i.setId(rs.getInt("id"));
+        i.setId(rs.getInt("student_id"));
+        i.setCompanyName(rs.getString("company"));
+        i.setInterviewDate(rs.getDate("date").toLocalDate().toString());
+        i.setInterviewTime(rs.getString("time"));
+        i.setLocation(rs.getString("location"));
+        i.setStatus(rs.getString("status"));
+        return i;
+    }
+}

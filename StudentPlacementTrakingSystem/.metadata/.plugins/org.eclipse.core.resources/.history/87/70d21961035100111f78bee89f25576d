@@ -1,0 +1,273 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.dao.ApplicationDao;
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Company;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/applyPlacement")
+public class ApplyPlacementServlet extends HttpServlet {
+
+    private ApplicationDao appDao = new ApplicationDaoImpl();
+
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    // =========================
+    // SHOW COMPANIES
+    // =========================
+    @Override
+    protected void doGet(HttpServletRequest req,
+                         HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+
+        if (session == null ||
+                session.getAttribute("user") == null) {
+
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        List<Company> companies =
+                companyDao.getAllCompanies();
+
+        res.setContentType("text/html");
+
+        PrintWriter out = res.getWriter();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html lang='en'>");
+
+        out.println("<head>");
+
+        out.println("<meta charset='UTF-8'>");
+
+        out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+
+        out.println("<title>Apply Placement</title>");
+
+        out.println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+
+        out.println("</head>");
+
+        out.println("<body>");
+
+        // SIDEBAR
+        out.println("<div class='sidebar'>"
+
+                + "<div class='logo'>"
+                + "<i class='fas fa-graduation-cap'></i>"
+                + "<h2>PlacePro</h2>"
+                + "</div>"
+
+                + "<div class='nav-links'>"
+
+                + "<a href='studentDashboard' class='nav-item'>"
+                + "<i class='fas fa-th-large'></i>Dashboard</a>"
+
+                + "<a href='profile' class='nav-item'>"
+                + "<i class='fas fa-user'></i>Profile</a>"
+
+                + "<a href='applications' class='nav-item'>"
+                + "<i class='fas fa-file-alt'></i>Applications</a>"
+
+                + "<a href='applyPlacement' class='nav-item active'>"
+                + "<i class='fas fa-paper-plane'></i>Apply</a>"
+
+                + "</div>"
+
+                + "<a href='logout'>"
+                + "<button class='logout-btn'>"
+                + "<i class='fas fa-sign-out-alt'></i>Logout"
+                + "</button>"
+                + "</a>"
+
+                + "</div>");
+
+        // MAIN CONTENT
+        out.println("<div class='main'>");
+
+        out.println("<h2>Available Companies</h2>");
+
+        out.println("<table class='applications-table'>");
+
+        out.println("<tr>");
+
+        out.println("<th>ID</th>");
+        out.println("<th>Name</th>");
+        out.println("<th>Location</th>");
+        out.println("<th>Package</th>");
+        out.println("<th>Action</th>");
+
+        out.println("</tr>");
+
+        for (Company c : companies) {
+
+            out.println("<tr>");
+
+            out.println("<td>" + c.getId() + "</td>");
+
+            out.println("<td>" + c.getName() + "</td>");
+
+            out.println("<td>" + c.getLocation() + "</td>");
+
+            out.println("<td>" + c.getPackageAmount() + "</td>");
+
+            out.println("<td>");
+
+            out.println("<form method='post' action='applyPlacement'>");
+
+            out.println("<input type='hidden' name='companyId' value='" + c.getId() + "'>");
+
+            out.println("<button type='submit' class='btn-apply'>Apply</button>");
+
+            out.println("</form>");
+
+            out.println("</td>");
+
+            out.println("</tr>");
+        }
+
+        out.println("</table>");
+
+        out.println("</div>");
+
+        out.println("</body>");
+
+        out.println("</html>");
+    }
+
+    // =========================
+    // APPLY COMPANY
+    // =========================
+    @Override
+    protected void doPost(HttpServletRequest req,
+                          HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+
+        if (session == null ||
+                session.getAttribute("user") == null) {
+
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        try {
+
+            Users u =
+                    (Users) session.getAttribute("user");
+
+            String companyIdStr =
+                    req.getParameter("companyId");
+
+            // VALIDATION
+            if (companyIdStr == null ||
+                    companyIdStr.isEmpty()) {
+
+                res.getWriter()
+                        .println("<h2>Company ID Missing</h2>");
+
+                return;
+            }
+
+            int companyId =
+                    Integer.parseInt(companyIdStr);
+
+            // CHECK COMPANY EXISTS
+            Connection con =
+                    DBConnection.getConnection();
+
+            PreparedStatement check =
+                    con.prepareStatement(
+                            "SELECT id FROM company WHERE id=?"
+                    );
+
+            check.setInt(1, companyId);
+
+            ResultSet rs =
+                    check.executeQuery();
+
+            if (!rs.next()) {
+
+                res.getWriter()
+                        .println("<h2>Invalid Company ID</h2>");
+
+                return;
+            }
+
+            // CREATE APPLICATION
+            Application app =
+                    new Application();
+
+            app.setStudentId(u.getId());
+
+            app.setCompanyId(companyId);
+
+            app.setApplyDate(
+                    LocalDate.now().toString());
+
+            app.setStatus("Applied");
+
+            // SAVE
+            boolean success =
+                    appDao.apply(app);
+
+            if (success) {
+
+                // INSERT NOTIFICATION
+                PreparedStatement ps =
+                        con.prepareStatement(
+                                "INSERT INTO notifications(student_id, message) VALUES (?, ?)"
+                        );
+
+                ps.setInt(1, u.getId());
+
+                ps.setString(
+                        2,
+                        "You applied for company ID "
+                                + companyId
+                );
+
+                ps.executeUpdate();
+
+                // REDIRECT
+                res.sendRedirect("applications");
+
+            } else {
+
+                res.getWriter()
+                        .println("<h2>Application Failed</h2>");
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+            res.getWriter()
+                    .println("<h2>Application Failed</h2>");
+        }
+    }
+}

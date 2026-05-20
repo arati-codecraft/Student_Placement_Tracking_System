@@ -1,0 +1,11 @@
+package org.placepro.repository;
+
+import java.util.List;
+import org.placepro.model.Users;
+
+public interface UsersRepository {
+    void save(Users user);
+    List<Users> findAll();
+    Users findByEmail(String email);
+    void delete(int id);
+}

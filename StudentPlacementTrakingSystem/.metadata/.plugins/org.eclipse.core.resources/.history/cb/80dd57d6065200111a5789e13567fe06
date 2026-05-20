@@ -1,0 +1,79 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.daoImpl.PlacementDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/studentDashboard")
+public class StudentDashboardServlet extends HttpServlet {
+
+    @Override
+	protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        PlacementDaoImpl dao = new PlacementDaoImpl();
+
+        int totalCompanies = dao.getTotalCompanies();
+        int totalApplications = dao.getTotalApplications(u.getId());
+        int selectedCount = dao.getSelectedCount(u.getId());
+        int interviewCount = dao.getInterviewCount(u.getId());
+
+        res.setContentType("text/html");
+        res.getWriter().println("<!DOCTYPE html>");
+        res.getWriter().println("<html lang='en'><head>");
+        res.getWriter().println("<meta charset='UTF-8'>");
+        res.getWriter().println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        res.getWriter().println("<title>PlacePro Dashboard</title>");
+        res.getWriter().println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+        res.getWriter().println("<link rel='stylesheet' href='CSS/Student.css'>"); // external CSS
+
+        res.getWriter().println("</head><body>");
+
+        // Sidebar
+        res.getWriter().println("<div class='sidebar'>"
+            + "<div class='logo'><i class='fas fa-graduation-cap'></i><h2>PlacePro</h2></div>"
+            + "<div class='nav-links'>"
+            + "<a href='studentDashboard' class='nav-item active'><i class='fas fa-th-large'></i>Dashboard</a>"
+            + "<a href='profile' class='nav-item'><i class='fas fa-user'></i>Profile</a>"
+            + "<a href='scheduleInterview' class='nav-item'><i class='fas fa-calendar-alt'></i>Interviews</a>"
+            + "<a href='applications' class='nav-item'><i class='fas fa-file-alt'></i>Applications</a>"
+            + "<a href='applyPlacement' class='nav-item'><i class='fas fa-paper-plane'></i>Apply</a>"
+            + "<a href=\"notifications\" class=\"nav-item\"><i class=\"fas fa-bell\"></i>Notifications</a>\r\n"
+            + "<a href='Coordinators.html' class='nav-item'><i class='fas fa-users'></i>Coordinators</a>"
+            + "</div>"
+            + "<button class='logout-btn'><i class='fas fa-sign-out-alt'></i>Logout</button>"
+            + "</div>");
+
+
+        // Main content
+        res.getWriter().println("<div class='main'>"
+            + "<div class='topbar'>"
+            + "<div class='search-box'><input type='text' placeholder='Search here...'></div>"
+            + "<div class='user-box'><div class='avatar'>S</div><div><strong>" + u.getName() + "</strong><br><small>Student pROFILE</small></div></div>"
+            + "</div>"
+            + "<div class='welcome-card'><div><h3>Student Dashboard</h3><h1>Welcome " + u.getName() + " 👋</h1><p>Manage your placements and applications easily</p></div><div class='welcome-icon'><i class='fas fa-user-graduate'></i></div></div>"
+            + "<div class='stats'>"
+            + "<div class='card'><i class='fas fa-building'></i><span class='count'>" + totalCompanies + "</span><div class='label'>Total Companies</div></div>"
+            + "<div class='card'><i class='fas fa-paper-plane'></i><span class='count'>" + totalApplications + "</span><div class='label'>Applications</div></div>"
+            + "<div class='card'><i class='fas fa-check-circle'></i><span class='count'>" + selectedCount + "</span><div class='label'>Selected</div></div>"
+            + "<div class='card'><i class='fas fa-calendar-check'></i><span class='count'>" + interviewCount + "</span><div class='label'>Interviews</div></div>"
+            + "</div></div>");
+
+        res.getWriter().println("</body></html>");
+    }
+}

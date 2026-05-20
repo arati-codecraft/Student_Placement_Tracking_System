@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>PlacePro Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<style>
+
+:root{
+    --primary:#7d3cff;
+    --light:#b185ff;
+    --bg:#f4f7fe;
+    --white:#ffffff;
+    --text:#333;
+    --gray:#777;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Segoe UI',sans-serif;
+}
+
+body{
+    display:flex;
+    background:var(--bg);
+    min-height:100vh;
+}
+
+/* ================= SIDEBAR ================= */
+
+.sidebar{
+    width:240px;
+    background:var(--primary);
+    color:white;
+    padding:30px 20px;
+    display:flex;
+    flex-direction:column;
+}
+
+.logo{
+    text-align:center;
+    margin-bottom:40px;
+}
+
+.logo i{
+    font-size:45px;
+    margin-bottom:10px;
+}
+
+.logo h2{
+    font-size:28px;
+}
+
+.nav-links{
+    flex:1;
+}
+
+.nav-item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    color:white;
+    text-decoration:none;
+    padding:14px 16px;
+    margin-bottom:10px;
+    border-radius:12px;
+    transition:0.3s;
+    font-weight:500;
+}
+
+.nav-item:hover{
+    background:white;
+    color:var(--primary);
+}
+
+.active{
+    background:white;
+    color:var(--primary);
+}
+
+.logout-btn{
+    background:white;
+    color:var(--primary);
+    border:none;
+    padding:14px;
+    border-radius:12px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:bold;
+    transition:0.3s;
+}
+
+.logout-btn:hover{
+    transform:translateY(-2px);
+}
+
+/* ================= MAIN ================= */
+
+.main{
+    flex:1;
+    padding:30px;
+}
+
+/* TOPBAR */
+
+.topbar{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.search-box{
+    background:white;
+    padding:12px 20px;
+    border-radius:30px;
+    width:320px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.search-box input{
+    border:none;
+    outline:none;
+    width:100%;
+    font-size:14px;
+}
+
+.user-box{
+    background:white;
+    padding:8px 15px;
+    border-radius:40px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.05);
+}
+
+.avatar{
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:var(--primary);
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-weight:bold;
+}
+
+/* ================= WELCOME ================= */
+
+.welcome-card{
+    background:linear-gradient(135deg,var(--primary),var(--light));
+    color:white;
+    border-radius:30px;
+    padding:40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:30px;
+}
+
+.welcome-card h3{
+    font-size:18px;
+    font-weight:400;
+    margin-bottom:10px;
+}
+
+.welcome-card h1{
+    font-size:42px;
+    margin-bottom:10px;
+}
+
+.welcome-card p{
+    font-size:16px;
+}
+
+.welcome-icon i{
+    font-size:140px;
+    opacity:0.8;
+}
+
+/* ================= STATS ================= */
+
+.stats{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:20px;
+}
+
+.card{
+    background:white;
+    border-radius:22px;
+    padding:30px 20px;
+    text-align:center;
+    box-shadow:0 4px 15px rgba(0,0,0,0.05);
+    transition:0.3s;
+}
+
+.card:hover{
+    transform:translateY(-5px);
+}
+
+.card i{
+    font-size:32px;
+    color:var(--primary);
+    margin-bottom:15px;
+}
+
+.count{
+    display:block;
+    font-size:38px;
+    font-weight:bold;
+    color:var(--text);
+    margin-bottom:8px;
+}
+
+.label{
+    color:var(--gray);
+    font-size:15px;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media(max-width:1000px){
+
+    .stats{
+        grid-template-columns:repeat(2,1fr);
+    }
+
+}
+
+@media(max-width:700px){
+
+    body{
+        flex-direction:column;
+    }
+
+    .sidebar{
+        width:100%;
+        min-height:auto;
+    }
+
+    .stats{
+        grid-template-columns:1fr;
+    }
+
+    .welcome-card{
+        flex-direction:column;
+        text-align:center;
+        gap:20px;
+    }
+
+    .topbar{
+        flex-direction:column;
+        gap:20px;
+    }
+
+    .search-box{
+        width:100%;
+    }
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- ================= SIDEBAR ================= -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        <i class="fas fa-graduation-cap"></i>
+        <h2>PlacePro</h2>
+    </div>
+
+    <div class="nav-links">
+
+        <a href="studentDashboard" class="nav-item active">
+            <i class="fas fa-th-large"></i>
+            Dashboard
+        </a>
+
+        <a href="/StudentPlaceTrackingSytem/profile" class="nav-item">
+            <i class="fas fa-user"></i>
+            Profile
+        </a>
+
+        <a href="//StudentPlaceTrackingSytem/scheduleInterview" class="nav-item">
+            <i class="fas fa-calendar-alt"></i>
+            Interviews
+        </a>
+
+       <a href="applications" class="nav-item active"><i class="fas fa-file-alt"></i>Applications</a>
+
+
+        <a href="applyPlacement" class="nav-item">
+            <i class="fas fa-paper-plane"></i>
+            Apply
+        </a>
+
+        <a href="coordinators" class="nav-item">
+            <i class="fas fa-users"></i>
+            Coordinators
+        </a>
+
+    </div>
+
+   <a href="logout">
+  <button class="logout-btn"><i class="fas fa-sign-out-alt"></i>Logout</button>
+</a>
+
+
+
+</div>
+
+<!-- ================= MAIN ================= -->
+
+<div class="main">
+
+    <!-- TOPBAR -->
+
+    <div class="topbar">
+
+        <div class="search-box">
+            <input type="text" placeholder="Search here...">
+        </div>
+
+        <div class="user-box">
+
+            <div class="avatar">
+                S
+            </div>
+
+            <div>
+                <strong>Student</strong><br>
+                <small>Student Panel</small>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- WELCOME -->
+
+    <div class="welcome-card">
+
+        <div>
+
+            <h3>Student Dashboard</h3>
+
+            <h1>Welcome Student 👋</h1>
+
+            <p>
+                Manage your placements and applications easily
+            </p>
+
+        </div>
+
+        <div class="welcome-icon">
+            <i class="fas fa-user-graduate"></i>
+        </div>
+
+    </div>
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+        <div class="card">
+
+            <i class="fas fa-building"></i>
+
+            <span class="count"
+            id="companiesCount">0</span>
+
+            <div class="label">
+                Total Companies
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <i class="fas fa-paper-plane"></i>
+
+            <span class="count"
+            id="appliedCount">0</span>
+
+            <div class="label">
+                Applications
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <i class="fas fa-check-circle"></i>
+
+            <span class="count"
+            id="selectedCount">0</span>
+
+            <div class="label">
+                Selected
+            </div>
+
+        </div>
+
+        <div class="card">
+
+            <i class="fas fa-calendar-check"></i>
+
+            <span class="count"
+            id="interviewCount">0</span>
+
+            <div class="label">
+                Interviews
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ================= SERVLET CONNECT ================= -->
+
+<script>
+
+async function loadDashboard(){
+
+    try{
+
+        const response =
+        await fetch("studentDashboard");
+
+        const data =
+        await response.json();
+
+        if(data.error){
+
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById("companiesCount")
+        .innerText = data.companies;
+
+        document.getElementById("appliedCount")
+        .innerText = data.applied;
+
+        document.getElementById("selectedCount")
+        .innerText = data.selected;
+
+        document.getElementById("interviewCount")
+        .innerText = data.interviews;
+
+    }
+    catch(error){
+
+        console.log(error);
+    }
+}
+
+loadDashboard();
+
+</script>
+
+</body>
+</html>

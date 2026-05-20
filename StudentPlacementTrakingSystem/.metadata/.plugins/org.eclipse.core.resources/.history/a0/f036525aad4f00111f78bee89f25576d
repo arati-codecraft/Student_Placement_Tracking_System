@@ -1,0 +1,94 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.daoImpl.InterviewDaoImpl;
+import org.placepro.model.Interview;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+/**
+ * Servlet implementation class InterviewServlet
+ */
+@WebServlet("/scheduleInterview")
+public class InterviewServlet extends HttpServlet {
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        // Fetch interviews from DAO
+        InterviewDaoImpl dao = new InterviewDaoImpl();
+        List<Interview> interviews = dao.getInterviewsByStudent(u.getId());
+
+        res.setContentType("text/html");
+        res.getWriter().println("<!DOCTYPE html><html><head><title>Interviews</title>");
+        res.getWriter().println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+        res.getWriter().println("<link rel='stylesheet' href='CSS/Student.css'>");
+        res.getWriter().println("<style>");
+        res.getWriter().println(".interview-table{width:100%;border-collapse:collapse;background:white;border-radius:12px;overflow:hidden;box-shadow:0 4px 15px rgba(0,0,0,0.05);} ");
+        res.getWriter().println(".interview-table th,.interview-table td{padding:12px 15px;text-align:left;border-bottom:1px solid #ddd;} ");
+        res.getWriter().println(".interview-table th{background:var(--primary);color:white;} ");
+        res.getWriter().println("</style>");
+        res.getWriter().println("</head><body>");
+
+        // Sidebar (reuse dashboard sidebar)
+        res.getWriter().println("<div class='sidebar'>"
+            + "<div class='logo'><i class='fas fa-graduation-cap'></i><h2>PlacePro</h2></div>"
+            + "<div class='nav-links'>"
+            + "<a href='studentDashboard' class='nav-item'><i class='fas fa-th-large'></i>Dashboard</a>"
+            + "<a href='profile' class='nav-item'><i class='fas fa-user'></i>Profile</a>"
+            + "<a href='scheduleInterview' class='nav-item active'><i class='fas fa-calendar-alt'></i>Interviews</a>"
+            + "<a href='placementTracker' class='nav-item'><i class='fas fa-file-alt'></i>Applications</a>"
+            + "<a href='applyPlacement' class='nav-item'><i class='fas fa-paper-plane'></i>Apply</a>"
+            + "<a href='coordinators' class='nav-item'><i class='fas fa-users'></i>Coordinators</a>"
+            + "</div>"
+            + "<button class='logout-btn'><i class='fas fa-sign-out-alt'></i>Logout</button>"
+            + "</div>");
+
+        // Main content
+        res.getWriter().println("<div class='main'>");
+        res.getWriter().println("<div class='welcome-card'><div><h3>Interview Schedule</h3><h1>Welcome " + u.getName() + " 👋</h1><p>Check your upcoming interviews below</p></div><div class='welcome-icon'><i class='fas fa-calendar-alt'></i></div></div>");
+
+        // Table
+        res.getWriter().println("<table class='interview-table'>");
+        res.getWriter().println("<tr><th>Company</th><th>Date</th><th>Time</th><th>Location</th><th>Status</th></tr>");
+        for (Interview i : interviews) {
+            res.getWriter().println("<tr>"
+                + "<td>" + i.getCompanyName() + "</td>"
+                + "<td>" + i.getDate() + "</td>"
+                + "<td>" + i.getTime() + "</td>"
+                + "<td>" + i.getLocation() + "</td>"
+                + "<td>" + i.getStatus() + "</td>"
+                + "</tr>");
+        }
+        res.getWriter().println("</table>");
+
+        res.getWriter().println("</div></body></html>");
+    }
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

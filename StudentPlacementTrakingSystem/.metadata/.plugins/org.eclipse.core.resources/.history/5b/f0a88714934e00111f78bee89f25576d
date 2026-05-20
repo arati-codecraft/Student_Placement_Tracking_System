@@ -1,0 +1,43 @@
+package org.placepro.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Servlet implementation class AddUserServlet
+ */
+@WebServlet("/addUser")
+public class AddUserServlet extends HttpServlet {
+    private UsersDao userDao = new UsersDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        Users u = new Users();
+        u.setName(req.getParameter("name"));
+        u.setEmail(req.getParameter("email"));
+        u.setMobile(req.getParameter("mobile"));
+        u.setCourse(req.getParameter("course"));
+        u.setPercentage(Double.parseDouble(req.getParameter("percentage")));
+        u.setSkills(req.getParameter("skills"));
+        u.setPassword(req.getParameter("password"));
+        u.setRole("student");
+        u.setStatus("Not Placed");
+
+        userDao.addUser(u);
+        resp.sendRedirect(req.getContextPath() + "/viewUsers");
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

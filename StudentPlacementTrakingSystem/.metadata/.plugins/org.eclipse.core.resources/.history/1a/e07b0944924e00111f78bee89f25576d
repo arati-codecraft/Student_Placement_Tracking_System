@@ -1,0 +1,14 @@
+package org.placepro.dao;
+
+import java.util.List;
+import org.placepro.model.User;
+
+public interface UserDao {
+    void addUser(User u);
+    void updateUser(User u);
+    void deleteUser(int id);
+    User getUserById(int id);
+    List<User> getAllUsers();
+    List<User> searchUsers(String course, Double percentage, String skill);
+    void updateUserStatus(int id, String status);
+}

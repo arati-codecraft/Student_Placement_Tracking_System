@@ -1,0 +1,8 @@
+package org.placepro.dao;
+
+import org.placepro.model.Student;
+
+public interface LoginDao {
+    boolean registerStudent(Student student);
+    boolean validateLogin(String email, String password);
+}

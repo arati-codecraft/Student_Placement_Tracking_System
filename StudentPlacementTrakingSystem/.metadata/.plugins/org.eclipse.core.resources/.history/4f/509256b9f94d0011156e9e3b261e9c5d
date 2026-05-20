@@ -1,0 +1,79 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        try {
+
+            AdminDao dao = new AdminDaoImpl();
+
+            StringBuilder json = new StringBuilder();
+
+            json.append("{");
+
+            // ===== DASHBOARD STATS =====
+            json.append("\"students\":").append(dao.totalStudents()).append(",");
+            json.append("\"companies\":").append(dao.totalCompanies()).append(",");
+            json.append("\"applications\":").append(dao.totalApplications()).append(",");
+            json.append("\"selected\":").append(dao.totalSelected()).append(",");
+
+            // ===== PLACEMENT DATA =====
+            json.append("\"data\":[");
+
+            java.util.List<Placement> list = dao.getAllPlacements();
+
+            for (int i = 0; i < list.size(); i++) {
+
+                Placement p = list.get(i);
+
+                json.append("{");
+
+                json.append("\"id\":").append(p.getId()).append(",");
+                json.append("\"studentName\":\"").append(escape(p.getStudentName())).append("\",");
+                json.append("\"companyName\":\"").append(escape(p.getCompanyName())).append("\",");
+                json.append("\"packageName\":\"").append(escape(p.getPackageName())).append("\",");
+                json.append("\"status\":\"").append(escape(p.getStatus())).append("\"");
+
+                json.append("}");
+
+                if (i < list.size() - 1) {
+                    json.append(",");
+                }
+            }
+
+            json.append("]}");
+
+            response.getWriter().write(json.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.getWriter().write("{\"error\":\"Server Error\"}");
+        }
+    }
+
+    // ===== SAFE STRING HANDLING =====
+    private String escape(String value) {
+        if (value == null) return "";
+        return value.replace("\"", "\\\"");
+    }
+
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+        doGet(request, response);
+    }
+}

@@ -1,0 +1,82 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+
+    private ApplicationDaoImpl dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        List<Application> apps = dao.getApplicationsByStudent(u.getId());
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+        
+ res.getWriter().println("<div class='sidebar'>"
+        		
+        		
+            + "<div class='logo'><i class='fas fa-graduation-cap'></i><h2>PlacePro</h2></div>"
+            + "<div class='nav-links'>"
+            + "<a href='studentDashboard' class='nav-item'><i class='fas fa-th-large'></i>Dashboard</a>"
+            + "<a href='scheduleInterview' class='nav-item active'><i class='fas fa-calendar-alt'></i>Interviews</a>"
+            + "<a href='applications' class='nav-item'><i class='fas fa-file-alt'></i>Applications</a>"
+            + "<a href='applyPlacement' class='nav-item'><i class='fas fa-paper-plane'></i>Apply</a>"
+            + "<a href='coordinators' class='nav-item'><i class='fas fa-users'></i>Coordinators</a>"
+            + "</div>"
+            + "<a href='logout'><button class='logout-btn'><i class='fas fa-sign-out-alt'></i>Logout</button></a>"
+            + "</div>");
+
+        // Main content
+        res.getWriter().println("<div class='main'><div class='topbar'>\r\n"
+        		+ "<div class='search-box'><input type='text' placeholder='Search here...'></div>\r\n"
+        		+ "<a href='profile' title='Click to edit profile' style='text-decoration:none;'><div class='user-box'><div class='avatar'>S</div><div><strong>" + u.getName() + "</strong><br><small>Student Profile</small></div></div></a>\r\n"
+        		+ "</div>");
+        res.getWriter().println("<div class='welcome-card'><div><h3>Interview Schedule</h3><h1>Welcome " + u.getName() + " 👋</h1><p>Check your upcoming interviews below</p></div><div class='welcome-icon'><i class='fas fa-calendar-alt'></i></div></div>");
+
+
+        out.println("<html><head><title>My Applications</title>");
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+        out.println("</head><body>");
+        out.println("<h2>My Applications</h2>");
+        out.println("<table class='applications-table'><tr><th>ID</th><th>Company</th><th>Location</th><th>Package</th><th>Status</th><th>Action</th></tr>");
+
+        for (Application a : apps) {
+            out.println("<tr>");
+            out.println("<td>" + a.getId() + "</td>");
+            out.println("<td>" + a.getCompanyName() + "</td>");
+            out.println("<td>" + a.getLocation() + "</td>");
+            out.println("<td>" + a.getPackageAmount() + "</td>");
+            out.println("<td>" + a.getStatus() + "</td>");
+            out.println("<td>");
+            out.println("<a href='withdrawApplication?id=" + a.getId() + "' class='btn btn-danger btn-sm'>Withdraw</a>");
+            out.println("</td>");
+            out.println("</tr>");
+        }
+
+        out.println("</table>");
+        out.println("<a href='profile'>Edit Profile</a>");
+        out.println("</body></html>");
+    }
+}

@@ -1,0 +1,32 @@
+package org.placepro.daoImpl;
+
+import java.util.List;
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.model.Users;
+import org.placepro.repository.UsersRepository;
+import org.placepro.repositoryImpl.UsersRepositoryImpl;
+
+public class UsersLoginDaoImpl implements UsersLoginDao {
+    private UsersRepository repo = new UsersRepositoryImpl();
+
+    @Override
+    public boolean registerUser(Users user) {
+        user.setRole("Student"); // enforce default role
+        return repo.saveUser(Users);
+    }
+
+    @Override
+    public Users loginUser(String email, String password) {
+        return repo.findByEmailAndPassword(email, password);
+    }
+
+    @Override
+    public List<Users> getAllUsers() {
+        return repo.findAll();
+    }
+
+    @Override
+    public void removeUser(int id) {
+        repo.delete(id);
+    }
+}

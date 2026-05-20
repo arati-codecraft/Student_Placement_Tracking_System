@@ -1,0 +1,151 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/studentDashboard")
+public class StudentDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        resp.setContentType("text/html");
+        resp.setCharacterEncoding("UTF-8");
+
+        PrintWriter out = resp.getWriter();
+
+        try {
+            HttpSession session = req.getSession(false);
+
+            if (session == null || session.getAttribute("userId") == null) {
+                out.println("<h2>Session Expired. Please Login Again</h2>");
+                return;
+            }
+
+            int studentId = (int) session.getAttribute("userId");
+
+            Connection con = DBConnection.getConnection();
+
+            int companies = getCount(con, "SELECT COUNT(*) FROM company");
+
+            int applied = getCount(con,
+                    "SELECT COUNT(*) FROM placements WHERE student_id=" + studentId);
+
+            int selected = getCount(con,
+                    "SELECT COUNT(*) FROM placements WHERE student_id=" + studentId +
+                            " AND status='Selected'");
+
+            int interviews = getCount(con,
+                    "SELECT COUNT(*) FROM interview i JOIN placements p ON i.placement_id=p.id WHERE p.student_id=" + studentId);
+
+            // ================= HTML START =================
+            out.println("<!DOCTYPE html>");
+            out.println("<html lang='en'>");
+            out.println("<head>");
+
+            out.println("<meta charset='UTF-8'>");
+            out.println("<meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+            out.println("<title>PlacePro Dashboard</title>");
+
+            out.println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+
+            // ================= CSS (YOUR DESIGN) =================
+            out.println("<style>");
+
+            out.println("body{background:#f4f7fe;display:flex;min-height:100vh;font-family:Segoe UI;}");
+            out.println(".sidebar{width:240px;background:#7d3cff;color:white;padding:40px 20px;}");
+            out.println(".main-content{flex:1;padding:30px;}");
+            out.println(".stats-container{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;}");
+            out.println(".stat-card{background:white;padding:30px;border-radius:20px;text-align:center;}");
+            out.println(".stat-value{font-size:36px;font-weight:bold;display:block;}");
+            out.println(".stat-icon{color:#7d3cff;font-size:30px;margin-bottom:10px;}");
+            out.println(".welcome-card{background:linear-gradient(135deg,#7d3cff,#b185ff);padding:40px;border-radius:30px;color:white;margin-bottom:30px;display:flex;justify-content:space-between;align-items:center;}");
+            out.println(".nav-item{color:white;display:block;margin:10px 0;text-decoration:none;}");
+            out.println(".logout-btn{background:white;color:#7d3cff;padding:10px;border:none;border-radius:10px;margin-top:20px;width:100%;}");
+
+            out.println("</style>");
+
+            out.println("</head>");
+
+            // ================= BODY =================
+            out.println("<body>");
+
+            // SIDEBAR
+            out.println("<aside class='sidebar'>");
+            out.println("<h2>PlacePro</h2>");
+            out.println("<a class='nav-item'>Dashboard</a>");
+            out.println("<a class='nav-item'>Profile</a>");
+            out.println("<a class='nav-item'>Interviews</a>");
+            out.println("<a class='nav-item'>Applications</a>");
+            out.println("<a class='nav-item'>Apply</a>");
+            out.println("<a class='nav-item'>Coordinators</a>");
+            out.println("<button class='logout-btn'>Logout</button>");
+            out.println("</aside>");
+
+            // MAIN
+            out.println("<main class='main-content'>");
+
+            // BANNER
+            out.println("<div class='welcome-card'>");
+            out.println("<div>");
+            out.println("<h3>Student Dashboard</h3>");
+            out.println("<h1>Welcome Student 👋</h1>");
+            out.println("<p>Manage your placements and applications</p>");
+            out.println("</div>");
+            out.println("<i class='fas fa-user-graduate' style='font-size:120px;'></i>");
+            out.println("</div>");
+
+            // STATS
+            out.println("<section class='stats-container'>");
+
+            out.println("<div class='stat-card'>");
+            out.println("<div class='stat-icon'><i class='fas fa-building'></i></div>");
+            out.println("<span class='stat-value'>" + companies + "</span>");
+            out.println("<span>Total Companies</span>");
+            out.println("</div>");
+
+            out.println("<div class='stat-card'>");
+            out.println("<div class='stat-icon'><i class='fas fa-paper-plane'></i></div>");
+            out.println("<span class='stat-value'>" + applied + "</span>");
+            out.println("<span>Applications</span>");
+            out.println("</div>");
+
+            out.println("<div class='stat-card'>");
+            out.println("<div class='stat-icon'><i class='fas fa-check-circle'></i></div>");
+            out.println("<span class='stat-value'>" + selected + "</span>");
+            out.println("<span>Selected</span>");
+            out.println("</div>");
+
+            out.println("<div class='stat-card'>");
+            out.println("<div class='stat-icon'><i class='fas fa-calendar-check'></i></div>");
+            out.println("<span class='stat-value'>" + interviews + "</span>");
+            out.println("<span>Interviews</span>");
+            out.println("</div>");
+
+            out.println("</section>");
+
+            out.println("</main>");
+
+            out.println("</body>");
+            out.println("</html>");
+
+            // ================= END =================
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.println("<h3>Error loading dashboard</h3>");
+        }
+    }
+
+    private int getCount(Connection con, String sql) throws Exception {
+        ResultSet rs = con.createStatement().executeQuery(sql);
+        return rs.next() ? rs.getInt(1) : 0;
+    }
+}

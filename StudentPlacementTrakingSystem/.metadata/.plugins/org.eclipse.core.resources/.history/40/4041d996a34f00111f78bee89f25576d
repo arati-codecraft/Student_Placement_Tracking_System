@@ -1,0 +1,76 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.daoImpl.UsersDaoImpl;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/profile")
+public class ProfileServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        res.setContentType("text/html");
+        res.getWriter().println("<!DOCTYPE html><html><head><title>Profile</title>"
+            + "<link rel='stylesheet' href='css/dashboard.css'>"
+            + "</head><body>");
+
+        res.getWriter().println("<h2>Student Profile</h2>");
+        res.getWriter().println("<form method='post' action='profile'>");
+        res.getWriter().println("Name: <input type='text' name='name' value='" + u.getName() + "'><br>");
+        res.getWriter().println("Email: <input type='text' name='email' value='" + u.getEmail() + "' readonly><br>");
+        res.getWriter().println("Mobile: <input type='text' name='mobile' value='" + u.getMobile() + "'><br>");
+        res.getWriter().println("Course: <input type='text' name='course' value='" + u.getCourse() + "'><br>");
+        res.getWriter().println("Percentage: <input type='text' name='percentage' value='" + u.getPercentage() + "'><br>");
+        res.getWriter().println("Skills: <input type='text' name='skills' value='" + u.getSkills() + "'><br>");
+        res.getWriter().println("<input type='submit' value='Update Profile'>");
+        res.getWriter().println("</form>");
+
+        res.getWriter().println("</body></html>");
+    }
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse res)
+            throws IOException, ServletException {
+
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+
+        // Update with new values
+        u.setName(req.getParameter("name"));
+        u.setMobile(req.getParameter("mobile"));
+        u.setCourse(req.getParameter("course"));
+        u.setPercentage(Double.parseDouble(req.getParameter("percentage")));
+        u.setSkills(req.getParameter("skills"));
+
+        // Save to DB
+        UsersDaoImpl dao = new UsersDaoImpl();
+        dao.updateUser(u);
+
+        // Refresh session
+        session.setAttribute("user", u);
+
+        // Redirect back to dashboard
+        res.sendRedirect("studentDashboard");
+    }
+}

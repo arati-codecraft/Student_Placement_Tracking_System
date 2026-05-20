@@ -1,0 +1,119 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.time.LocalDate;
+import java.util.List;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Company;
+import org.placepro.model.Users;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/applyPlacement")
+public class ApplyPlacementServlet extends HttpServlet {
+    private ApplicationDao appDao = new ApplicationDaoImpl();
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        List<Company> companies = companyDao.getAllCompanies();
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("<!DOCTYPE html><html lang='en'><head>");
+        out.println("<meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        out.println("<title>Apply Placement</title>");
+        // ✅ include Font Awesome for icons
+        out.println("<link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'>");
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+        out.println("</head><body>");
+
+        // Sidebar with icons
+        out.println("<div class='sidebar'>"
+            + "<div class='logo'><i class='fas fa-graduation-cap'></i><h2>PlacePro</h2></div>"
+            + "<div class='nav-links'>"
+            + "<a href='studentDashboard' class='nav-item'><i class='fas fa-th-large'></i>Dashboard</a>"
+            + "<a href='profile' class='nav-item'><i class='fas fa-user'></i>Profile</a>"
+            + "<a href='scheduleInterview' class='nav-item'><i class='fas fa-calendar-alt'></i>Interviews</a>"
+            + "<a href='applications' class='nav-item'><i class='fas fa-file-alt'></i>Applications</a>"
+            + "<a href='applyPlacement' class='nav-item active'><i class='fas fa-paper-plane'></i>Apply</a>"
+            + "<a href='Coordinators.html' class='nav-item'><i class='fas fa-users'></i>Coordinators</a>"
+            + "</div>"
+            + "<a href='logout'><button class='logout-btn'><i class='fas fa-sign-out-alt'></i>Logout</button></a>"
+            + "</div>");
+
+        // Main content
+        out.println("<div class='main'>");
+        out.println("<h2>Available Companies</h2>");
+        out.println("<table class='applications-table'>");
+        out.println("<tr><th>ID</th><th>Name</th><th>Location</th><th>Package</th><th>Action</th></tr>");
+
+        for (Company c : companies) {
+            out.println("<tr>"
+                + "<td>" + c.getId() + "</td>"
+                + "<td>" + c.getName() + "</td>"
+                + "<td>" + c.getLocation() + "</td>"
+                + "<td>" + c.getPackageAmount() + "</td>"
+                + "<td>"
+                + "<form method='post' action='applyPlacement'>"
+                + "<input type='hidden' name='companyId' value='" + c.getId() + "'/>"
+                + "<button type='submit' class='btn-apply'>Apply</button>"
+                + "</form>"
+                + "</td>"
+                + "</tr>");
+        }
+
+        out.println("</table></div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        int companyId = Integer.parseInt(req.getParameter("companyId"));
+
+        Application app = new Application();
+        app.setStudentId(u.getId());
+        app.setCompanyId(companyId);
+        app.setApplyDate(LocalDate.now().toString());
+        app.setStatus("Applied");
+
+        // ✅ Save application
+        appDao.apply(app);
+
+        // ✅ Insert notification
+        try (Connection con = DBConnection.getConnection();
+             java.sql.PreparedStatement ps = con.prepareStatement(
+                 "INSERT INTO notifications(student_id, message) VALUES (?, ?)"
+             )) {
+            ps.setInt(1, u.getId());
+            ps.setString(2, "You applied for company ID " + companyId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        res.sendRedirect("applications?success=1");
+
+    }

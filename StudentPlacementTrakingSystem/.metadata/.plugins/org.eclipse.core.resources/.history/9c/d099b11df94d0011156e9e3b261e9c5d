@@ -1,0 +1,95 @@
+<script>
+
+let backendData = [];
+
+// ===== LOAD DASHBOARD FROM DB =====
+async function loadDashboard() {
+
+    try {
+        const res = await fetch("admindashboard");
+        const data = await res.json();
+
+        backendData = data.data || [];
+
+        // STATS FROM DATABASE
+        document.getElementById("studentsCount").innerText = data.students;
+        document.getElementById("companyCount").innerText = data.companies;
+        document.getElementById("applicationCount").innerText = data.applications;
+        document.getElementById("selectedCount").innerText = data.selected;
+
+        renderTable();
+
+    } catch (error) {
+        console.error("Error loading dashboard:", error);
+    }
+}
+
+// ===== RENDER TABLE =====
+function renderTable() {
+
+    let table = document.getElementById("tableBody");
+    table.innerHTML = "";
+
+    backendData.forEach((d) => {
+
+        let badgeClass = "badge-applied";
+
+        if (d.status === "Selected") badgeClass = "badge-selected";
+        else if (d.status === "Rejected") badgeClass = "badge-rejected";
+
+        table.innerHTML += `
+        <tr>
+            <td>${d.studentName}</td>
+            <td>${d.companyName}</td>
+            <td>${d.packageName}</td>
+            <td><span class="badge ${badgeClass}">${d.status}</span></td>
+            <td>
+                <button class="btn btn-success btn-sm"
+                    onclick="updateStatus(${d.id}, 'Selected')">
+                    Select
+                </button>
+
+                <button class="btn btn-danger btn-sm"
+                    onclick="updateStatus(${d.id}, 'Rejected')">
+                    Reject
+                </button>
+            </td>
+        </tr>`;
+    });
+}
+
+// ===== UPDATE STATUS IN DATABASE =====
+async function updateStatus(id, status) {
+
+    try {
+        await fetch("updateplacemetstatus", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            body: `id=${id}&status=${status}`
+        });
+
+        loadDashboard(); // refresh from DB
+
+    } catch (error) {
+        console.error("Update failed:", error);
+    }
+}
+
+// ===== SEARCH TABLE =====
+function searchTable() {
+
+    let input = document.getElementById("search").value.toLowerCase();
+    let rows = document.querySelectorAll("#tableBody tr");
+
+    rows.forEach(row => {
+        row.style.display =
+            row.innerText.toLowerCase().includes(input) ? "" : "none";
+    });
+}
+
+// INIT LOAD
+loadDashboard();
+
+</script>

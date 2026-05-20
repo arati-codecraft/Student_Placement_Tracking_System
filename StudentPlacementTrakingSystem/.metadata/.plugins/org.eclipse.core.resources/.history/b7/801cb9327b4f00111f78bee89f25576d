@@ -1,0 +1,81 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+
+import org.placepro.DBconfig.DBConnection;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+/**
+ * Servlet implementation class StudentDashboardServlet
+ */
+@WebServlet("/studentdashboard")
+public class StudentDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        PrintWriter out = resp.getWriter();
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            HttpSession session = req.getSession();
+            int studentId = (int) session.getAttribute("userId");
+
+            String sql =
+                "SELECT c.*, p.status FROM company c " +
+                "LEFT JOIN placements p ON c.id = p.company_id AND p.student_id=? " +
+                "WHERE c.packageAmount <= (SELECT percentage FROM users WHERE id=?)";
+
+            PreparedStatement ps = con.prepareStatement(sql);
+            ps.setInt(1, studentId);
+            ps.setInt(2, studentId);
+
+            ResultSet rs = ps.executeQuery();
+
+            out.println("<h2>Available Companies</h2>");
+
+            while (rs.next()) {
+
+                int cid = rs.getInt("id");
+                String status = rs.getString("status");
+
+                out.println("<p>" + rs.getString("name") + " - " + rs.getDouble("packageAmount") + "</p>");
+
+                if (status == null) {
+                    out.println("<form action='applyPlacement' method='post'>");
+                    out.println("<input type='hidden' name='student_id' value='" + studentId + "'>");
+                    out.println("<input type='hidden' name='company_id' value='" + cid + "'>");
+                    out.println("<button>Apply</button></form>");
+                } else {
+                    out.println("<b>Status: " + status + "</b>");
+                }
+
+                out.println("<hr>");
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

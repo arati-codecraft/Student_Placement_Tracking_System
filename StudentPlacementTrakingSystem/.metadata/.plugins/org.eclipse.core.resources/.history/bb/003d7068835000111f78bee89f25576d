@@ -1,0 +1,26 @@
+package org.placepro.repository;
+
+import java.util.List;
+import org.placepro.model.Placement;
+
+public interface PlacementRepository {
+    // Student applies for a placement
+	void save(int studentId, int companyId, String applyDate, String status);
+    // Get all placement applications (for admin or student views)
+    List<Placement> findAll();
+
+    // Update status (Selected / Rejected / Interview)
+    void updateStatus(int id, String status);
+
+    // Dashboard counts
+    int getTotalCompanies();
+    int getTotalApplications(int studentId);
+    int getSelectedCount(int studentId);
+    int getInterviewCount(int studentId);
+
+	void applyPlacement(int studentId, int companyId);
+	List<Placement> getAllApplications();
+	
+	}
+
+

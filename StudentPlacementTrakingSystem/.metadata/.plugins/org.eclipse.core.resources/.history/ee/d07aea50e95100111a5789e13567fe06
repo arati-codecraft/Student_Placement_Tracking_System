@@ -1,0 +1,138 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Application;
+import org.placepro.model.Placement;
+import org.placepro.repository.AdminRepository;
+
+public class AdminRepositoryImpl extends DBConnection implements AdminRepository {
+
+    // ✅ FETCH ALL PLACEMENTS DATA
+    @Override
+    public List<Placement> findAllPlacements() {
+
+        List<Placement> list = new ArrayList<>();
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(
+
+                "SELECT p.id, u.name AS studentName, u.email, u.course, u.education, " +
+                "c.name AS companyName, c.packageAmount, p.status " +
+                "FROM placements p " +
+                "JOIN users u ON p.student_id = u.id " +
+                "JOIN company c ON p.company_id = c.id"
+
+             );
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+
+                Placement pl = new Placement();
+
+                pl.setId(rs.getInt("id"));
+                pl.setStudentName(rs.getString("studentName"));
+                pl.setEmail(rs.getString("email"));
+                pl.setCourse(rs.getString("course"));
+                pl.setEducation(rs.getString("education"));
+                pl.setCompanyName(rs.getString("companyName"));
+                pl.setPackageAmount(rs.getDouble("packageAmount")); // ✅ FIXED
+                pl.setStatus(rs.getString("status"));
+
+                list.add(pl);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    // ✅ TOTAL STUDENTS
+    @Override
+    public int countStudents() {
+        return getCount("SELECT COUNT(*) FROM users WHERE role='Student'");
+    }
+
+    // ✅ TOTAL COMPANIES
+    @Override
+    public int countCompanies() {
+        return getCount("SELECT COUNT(*) FROM company");
+    }
+
+    // ✅ TOTAL APPLICATIONS
+    @Override
+    public int countApplications() {
+        return getCount("SELECT COUNT(*) FROM placements");
+    }
+
+    // 🔥 ✅ TOTAL SELECTED STUDENTS (FIXED LOGIC)
+    @Override
+    public int countSelected() {
+        return getCount("SELECT COUNT(DISTINCT student_id) FROM placements WHERE status='Selected'");
+    }
+
+    // 🔥 COMMON METHOD FOR COUNT
+    private int getCount(String sql) {
+
+        int count = 0;
+
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            if (rs.next()) {
+                count = rs.getInt(1);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+ 
+    public interface ApplicationRepository {
+        boolean save(Application app);   // ✅ return boolean
+        List<Application> findByStudentId(int studentId);
+        void updateStatus(int appId, String status);
+        void delete(int appId);
+    }
+    // 🔥 UPDATE STATUS + AUTO REJECT LOGIC
+    @Override
+    public void updatePlacementStatus(int id, String status) {
+
+        try (Connection con = DBConnection.getConnection()) {
+
+            // 1️⃣ Update selected/rejected record
+            PreparedStatement ps1 = con.prepareStatement(
+                "UPDATE placements SET status=? WHERE id=?"
+            );
+            ps1.setString(1, status);
+            ps1.setInt(2, id);
+            ps1.executeUpdate();
+
+            // 2️⃣ If selected → reject other companies for same student
+            if ("Selected".equalsIgnoreCase(status)) {
+
+                PreparedStatement ps2 = con.prepareStatement(
+                    "UPDATE placements SET status='Rejected' " +
+                    "WHERE student_id = (SELECT student_id FROM placements WHERE id=?) AND id != ?"
+                );
+                ps2.setInt(1, id);
+                ps2.setInt(2, id);
+                ps2.executeUpdate();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+   
+}

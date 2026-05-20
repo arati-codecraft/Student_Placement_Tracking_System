@@ -1,0 +1,83 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.UsersLoginDao;
+import org.placepro.model.Users;
+import org.placepro.repositoryImpl.UsersRepositoryImpl;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+
+@WebServlet("/studentregistration")
+public class RegistrationServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
+       
+    /**
+     * @see HttpServlet#HttpServlet()
+     */
+    public RegistrationServlet() {
+        super();
+        // TODO Auto-generated constructor stub
+    }
+
+	/**
+	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+	 */
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // Collect form data
+        String name = request.getParameter("name");
+        String email = request.getParameter("email");
+        String mobile = request.getParameter("mobile");
+        String course = request.getParameter("course");
+        String percentageStr = request.getParameter("percentage");
+        String skills = request.getParameter("skills");
+        String password = request.getParameter("password");
+        String confirmPassword = request.getParameter("confirmPassword");
+
+        // Validate password match
+        if (!password.equals(confirmPassword)) {
+            response.sendRedirect("register.html?error=PasswordMismatch");
+            return;
+        }
+
+        double percentage = Double.parseDouble(percentageStr);
+
+        // Create Student object
+        Users s = new Users();
+        s.setName(name);
+        s.setEmail(email);
+        s.setMobile(mobile);
+        s.setCourse(course);
+        s.setPercentage(percentage);
+        s.setSkills(skills);
+        s.setPassword(password);
+
+        // Call DAO
+        UsersLoginDao dao = new UsersRepositoryImpl();
+        boolean result = dao.registerUser(s);
+
+        if (result) {
+            response.sendRedirect("login.html?success=Registered");
+        } else {
+            response.sendRedirect("register.html?error=Failed");
+        }
+    }
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doget(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

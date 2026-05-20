@@ -1,0 +1,46 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.PlacementDao;
+import org.placepro.daoImpl.PlacementDaoImpl;   // ✅ Added import
+import org.placepro.model.Placement;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class PlacementTrackerServlet
+ */
+@WebServlet("/placementTracker")
+public class PlacementTrackerServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private PlacementDao placementDao = new PlacementDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        List<Placement> applications = placementDao.getAllApplications();
+
+        out.println("<html><body><h2>Placement Applications</h2>");
+        out.println("<table border='1'><tr><th>Student</th><th>Company</th><th>Package</th><th>Status</th></tr>");
+        for (Placement p : applications) {
+            out.println("<tr><td>"+p.getStudentName()+"</td><td>"+p.getCompanyName()+"</td>"
+                + "<td>"+p.getPackageAmount()+"</td><td>"+p.getStatus()+"</td></tr>");
+        }
+        out.println("</table></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+}

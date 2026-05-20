@@ -1,0 +1,45 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.daoImpl.PlacementDaoImpl;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/studentDashboard")
+public class StudentDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse res)
+            throws IOException {
+
+        HttpSession session = req.getSession(false);
+        Users u = (Users) session.getAttribute("user");
+        if (u == null) {
+            res.sendRedirect("student-login.html");
+            return;
+        }
+
+        PlacementDaoImpl dao = new PlacementDaoImpl();
+
+        int totalCompanies = dao.getTotalCompanies();
+        int totalApplications = dao.getTotalApplications(s.getId());
+        int selectedCount = dao.getSelectedCount(s.getId());
+        int interviewCount = dao.getInterviewCount(s.getId());
+
+        res.setContentType("text/html");
+        res.getWriter().println(
+            "<html><head><title>Student Dashboard</title></head><body>" +
+            "<h2>Welcome " + s.getName() + " 👋</h2>" +
+            "<div>Total Companies: " + totalCompanies + "</div>" +
+            "<div>Applications: " + totalApplications + "</div>" +
+            "<div>Selected: " + selectedCount + "</div>" +
+            "<div>Interviews: " + interviewCount + "</div>" +
+            "<a href='logout'>Logout</a>" +
+            "</body></html>"
+        );
+    }
+}

@@ -1,0 +1,57 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Users;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+
+    private ApplicationDaoImpl dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        List<Application> apps = dao.getApplicationsByStudent(u.getId());
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("<html><head><title>My Applications</title>");
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+        out.println("</head><body>");
+        out.println("<h2>My Applications</h2>");
+        out.println("<table class='applications-table'><tr><th>ID</th><th>Company</th><th>Location</th><th>Package</th><th>Status</th><th>Action</th></tr>");
+
+        for (Application a : apps) {
+            out.println("<tr>");
+            out.println("<td>" + a.getId() + "</td>");
+            out.println("<td>" + a.getCompanyName() + "</td>");
+            out.println("<td>" + a.getLocation() + "</td>");
+            out.println("<td>" + a.getPackageAmount() + "</td>");
+            out.println("<td>" + a.getStatus() + "</td>");
+            out.println("<td>");
+            out.println("<a href='withdrawApplication?id=" + a.getId() + "' class='btn btn-danger btn-sm'>Withdraw</a>");
+            out.println("</td>");
+            out.println("</tr>");
+        }
+
+        out.println("</table>");
+        out.println("<a href='profile'>Edit Profile</a>");
+        out.println("</body></html>");
+    }
+}

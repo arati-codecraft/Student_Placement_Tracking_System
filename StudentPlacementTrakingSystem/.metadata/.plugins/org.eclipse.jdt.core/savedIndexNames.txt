@@ -1,0 +1,7 @@
+INDEX VERSION 1.134+C:\Users\Arati\OneDrive\Documents\StudentPlacementTrakingSystem\.metadata\.plugins\org.eclipse.jdt.core
+2615558395.index
+2864978857.index
+110084461.index
+1103814408.index
+1865797976.index
+78458938.index

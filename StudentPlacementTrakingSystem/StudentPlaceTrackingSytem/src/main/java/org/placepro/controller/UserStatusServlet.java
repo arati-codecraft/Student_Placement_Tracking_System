@@ -1,0 +1,39 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/updateStatus")
+public class UserStatusServlet extends HttpServlet {
+
+    private AdminDao dao = new AdminDaoImpl(); // ✅ FIXED
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        int id = Integer.parseInt(req.getParameter("id"));
+        String status = req.getParameter("status");
+
+        System.out.println("Updating placement ID: " + id + " → " + status); // DEBUG
+
+        dao.updateStatus(id, status); // ✅ CORRECT METHOD
+
+        resp.sendRedirect("admindashboard"); // ✅ ONLY ONE REDIRECT
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+
+        doGet(req, resp); // reuse
+    }
+}

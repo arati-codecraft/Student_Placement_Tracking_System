@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard - PlacePro</title>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg bg-light shadow">
+  <div class="container-fluid">
+    <a class="navbar-brand fw-bold" href="../placepro.html">PlacePro</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mx-auto">
+        <li class="nav-item"><a class="nav-link" href="Profile.html">Profile</a></li>
+        <li class="nav-item"><a class="nav-link" href="ViewCompanies.html">View Companies</a></li>
+        <li class="nav-item"><a class="nav-link" href="PlacementStatus.html">Placement Status</a></li>
+      </ul>
+      <a href="../logoutServlet" class="btn btn-danger">Logout</a>
+    </div>
+  </div>
+</nav>
+
+<div class="container py-5">
+  <h2 class="fw-bold">Welcome Student</h2>
+  <p>Use the navigation above to manage your profile, apply for companies, and check placement status.</p>
+</div>
+</body>
+</html>

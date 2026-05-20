@@ -1,0 +1,42 @@
+package org.placepro.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Servlet implementation class UpdateCompanyServlet
+ */
+@WebServlet("/updateCompany")
+public class UpdateCompanyServlet extends HttpServlet {
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        int id = Integer.parseInt(req.getParameter("id"));
+        Company c = companyDao.getCompanyById(id);
+
+        c.setPackageAmount(Double.parseDouble(req.getParameter("package")));
+        c.setEligibilityCriteria(req.getParameter("eligibility"));
+        c.setJobRole(req.getParameter("jobRole"));
+        c.setLastDateToApply(java.sql.Date.valueOf(req.getParameter("lastDate")));
+        c.setStatus(req.getParameter("status"));
+
+        companyDao.updateCompany(c);
+        resp.sendRedirect("managecompany");
+    }
+
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

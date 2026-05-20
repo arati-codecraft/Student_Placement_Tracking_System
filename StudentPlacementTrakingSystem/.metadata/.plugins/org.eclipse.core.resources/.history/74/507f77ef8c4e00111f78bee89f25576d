@@ -1,0 +1,26 @@
+package org.placepro.daoImpl;
+
+import java.util.List;
+import org.placepro.dao.CompanyDao;
+import org.placepro.model.Company;
+import org.placepro.repository.CompanyRepository;
+import org.placepro.repositoryImpl.CompanyRepositoryImpl;
+
+public class CompanyDaoImpl implements CompanyDao {
+    private CompanyRepository repo = new CompanyRepositoryImpl();
+
+    @Override
+    public void addCompany(Company company) { repo.save(company); }
+
+    @Override
+    public void updateCompany(Company company) { repo.update(company); }
+
+    @Override
+    public void deleteCompany(int id) { repo.delete(id); }
+
+    @Override
+    public List<Company> getAllCompanies() { return repo.findAllCompanies(); }
+
+    @Override
+    public Company getCompanyById(int id) { return repo.findById(id); }
+}

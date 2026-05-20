@@ -1,0 +1,14 @@
+package org.placepro.controller;
+
+import org.placepro.dao.CompanyDao;
+import org.placepro.model.Company;
+
+public class CompanyDaoImpl implements CompanyDao {
+
+	@Override
+	public boolean addCompany(Company company) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+}

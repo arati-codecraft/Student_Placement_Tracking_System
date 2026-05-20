@@ -1,0 +1,79 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+
+import org.placepro.dao.ApplicationDao;
+import org.placepro.daoImpl.ApplicationDaoImpl;
+import org.placepro.model.Application;
+import org.placepro.model.Users;
+import java.util.*;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
+
+@WebServlet("/applications")
+public class ApplicationsServlet extends HttpServlet {
+    private ApplicationDao dao = new ApplicationDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException {
+        HttpSession session = req.getSession(false);
+        if (session == null || session.getAttribute("user") == null) {
+            res.sendRedirect("login.html");
+            return;
+        }
+
+        Users u = (Users) session.getAttribute("user");
+        List<Application> apps = dao.getApplicationsByStudent(u.getId());
+
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
+
+        out.println("<!DOCTYPE html><html lang='en'><head>");
+        out.println("<meta charset='UTF-8'><meta name='viewport' content='width=device-width, initial-scale=1.0'>");
+        out.println("<title>Applications</title>");
+        out.println("<link rel='stylesheet' href='CSS/Student.css'>");
+        out.println("</head><body>");
+
+        // Sidebar
+        out.println("<div class='sidebar'>"
+            + "<div class='logo'><i class='fas fa-graduation-cap'></i><h2>PlacePro</h2></div>"
+            + "<div class='nav-links'>"
+            + "<a href='studentDashboard' class='nav-item'><i class='fas fa-th-large'></i>Dashboard</a>"
+            + "<a href='profile' class='nav-item'><i class='fas fa-user'></i>Profile</a>"
+            + "<a href='scheduleInterview' class='nav-item'><i class='fas fa-calendar-alt'></i>Interviews</a>"
+            + "<a href='applications' class='nav-item active'><i class='fas fa-file-alt'></i>Applications</a>"
+            + "<a href='applyPlacement' class='nav-item'><i class='fas fa-paper-plane'></i>Apply</a>"
+            + "<a href='coordinators' class='nav-item'><i class='fas fa-users'></i>Coordinators</a>"
+            + "</div>"
+            + "<button class='logout-btn'><i class='fas fa-sign-out-alt'></i>Logout</button>"
+            + "</div>");
+
+        // Main content
+        out.println("<div class='main'>");
+        out.println("<h2>Your Applications</h2>");
+        out.println("<table class='applications-table'>");
+        out.println("<tr><th>Company</th><th>Location</th><th>Package</th><th>Criteria</th><th>Date</th><th>Status</th></tr>");
+
+        for (Application a : apps) {
+            out.println("<tr>"
+                + "<td>" + a.getCompanyName() + "</td>"
+                + "<td>" + a.getLocation() + "</td>"
+                + "<td>" + a.getPackageAmount() + "</td>"
+                + "<td>" + a.getCriteria() + "</td>"
+                + "<td>" + a.getApplyDate() + "</td>"
+                + "<td>" + a.getStatus() + "</td>"
+                + "</tr>");
+        }
+
+        out.println("</table></div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        doGet(request, response);
+    }
+}

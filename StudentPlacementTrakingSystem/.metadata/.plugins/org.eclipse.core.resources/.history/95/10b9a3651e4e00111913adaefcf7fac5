@@ -1,0 +1,102 @@
+package org.placepro.repositoryImpl;
+
+
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Placement;
+import org.placepro.repository.PlacementRepository;
+
+public class PlacementRepositoryImpl implements PlacementRepository {
+
+    public List<Placement> findAllPlacements() {
+
+        List<Placement> list = new ArrayList<>();
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            String query = "SELECT p.id, u.name, c.company_name, c.package, p.status " +
+                           "FROM placements p " +
+                           "JOIN users u ON p.student_id = u.id " +
+                           "JOIN companies c ON p.company_id = c.id";
+
+            PreparedStatement ps = con.prepareStatement(query);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+
+                Placement p = new Placement();
+
+                p.setId(rs.getInt("id"));
+                p.setStudentName(rs.getString("name"));
+                p.setCompanyName(rs.getString("company_name"));
+                p.setPackageName(rs.getString("package"));
+                p.setStatus(rs.getString("status"));
+
+                list.add(p);
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    public int countStudents() {
+        return count("SELECT COUNT(*) FROM users");
+    }
+
+    public int countCompanies() {
+        return count("SELECT COUNT(*) FROM companies");
+    }
+
+    public int countApplications() {
+        return count("SELECT COUNT(*) FROM placements");
+    }
+
+    public int countSelected() {
+        return count("SELECT COUNT(*) FROM placements WHERE status='Selected'");
+    }
+
+    private int count(String sql) {
+        int count = 0;
+
+        try {
+            Connection con = DBConnection.getConnection();
+            PreparedStatement ps = con.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery();
+
+            if (rs.next()) count = rs.getInt(1);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return count;
+    }
+
+    public void updatePlacementStatus(int id, String status) {
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            String query = "UPDATE placements SET status=? WHERE id=?";
+            PreparedStatement ps = con.prepareStatement(query);
+
+            ps.setString(1, status);
+            ps.setInt(2, id);
+
+            ps.executeUpdate();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+}

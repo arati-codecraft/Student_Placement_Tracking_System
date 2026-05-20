@@ -1,0 +1,12 @@
+package org.placepro.dao;
+
+import java.util.List;
+
+import org.placepro.model.Application;
+
+public interface ApplicationDao {
+    boolean apply(Application app);
+    List<Application> getApplicationsByStudent(int studentId);
+    void updateStatus(int appId, String status);
+    void deleteApplication(int appId);
+}

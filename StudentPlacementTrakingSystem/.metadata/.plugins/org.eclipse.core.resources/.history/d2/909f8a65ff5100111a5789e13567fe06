@@ -1,0 +1,199 @@
+package org.placepro.repositoryImpl;
+
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.placepro.DBconfig.DBConnection;
+import org.placepro.model.Placement;
+import org.placepro.repository.PlacementRepository;
+
+public class PlacementRepositoryImpl implements PlacementRepository {
+
+	@Override
+	public void save(int studentId, int companyId,
+	                 String applyDate, String status) {
+
+	    try {
+
+	        Connection con = DBConnection.getConnection();
+
+	        // CHECK COMPANY EXISTS
+	        PreparedStatement check =
+	            con.prepareStatement(
+	                "SELECT id FROM company WHERE id=?"
+	            );
+
+	        check.setInt(1, companyId);
+
+	        ResultSet rs = check.executeQuery();
+
+	        if (!rs.next()) {
+
+	            System.out.println("Invalid company ID");
+
+	            return;
+	        }
+
+	        // INSERT
+	        String sql =
+	            "INSERT INTO placements(student_id, company_id, apply_date, status) VALUES(?,?,?,?)";
+
+	        PreparedStatement ps =
+	            con.prepareStatement(sql);
+
+	        ps.setInt(1, studentId);
+
+	        ps.setInt(2, companyId);
+
+	        ps.setDate(3,
+	            java.sql.Date.valueOf(applyDate));
+
+	        ps.setString(4, status);
+
+	        ps.executeUpdate();
+
+	    } catch (Exception e) {
+
+	        e.printStackTrace();
+	    }
+	}
+
+    @Override
+    public List<Placement> findAll() {
+        List<Placement> list = new ArrayList<>();
+        String sql = "SELECT p.id, u.name, u.email, u.course, u.education, " +
+                     "c.name AS companyName, c.location, c.packageAmount, p.status " +
+                     "FROM placements p " +
+                     "JOIN users u ON p.student_id = u.id " +
+                     "JOIN company c ON p.company_id = c.id";
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(sql)) {
+
+            while (rs.next()) {
+                Placement pl = new Placement();
+                pl.setId(rs.getInt("id"));
+                pl.setStudentName(rs.getString("name"));
+                pl.setEmail(rs.getString("email"));
+                pl.setCourse(rs.getString("course"));
+                pl.setEducation(rs.getString("education"));
+                pl.setCompanyName(rs.getString("companyName"));
+                pl.setLocation(rs.getString("location"));
+                pl.setPackageAmount(rs.getDouble("packageAmount"));
+                pl.setStatus(rs.getString("status"));
+                list.add(pl);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+ // PlacementDaoImpl
+ // PlacementDaoImpl.java
+    @Override
+    public void updateStatus(int id, String status) {
+        try (Connection con = DBConnection.getConnection()) {
+            // Update placements
+            PreparedStatement ps1 = con.prepareStatement("UPDATE placements SET status=? WHERE id=?");
+            ps1.setString(1, status);
+            ps1.setInt(2, id);
+            ps1.executeUpdate();
+
+            // Update applications (same id reference)
+            PreparedStatement ps2 = con.prepareStatement("UPDATE applications SET status=? WHERE id=?");
+            ps2.setString(1, status);
+            ps2.setInt(2, id);
+            ps2.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Override
+    public int getTotalCompanies() {
+        String sql = "SELECT COUNT(*) FROM company";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+				return rs.getInt(1);
+			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getTotalApplications(int studentId) {
+        String sql = "SELECT COUNT(*) FROM placements WHERE student_id=?";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+				return rs.getInt(1);
+			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getSelectedCount(int studentId) {
+        String sql = "SELECT COUNT(*) FROM placements WHERE student_id=? AND status='Selected'";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+				return rs.getInt(1);
+			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public int getInterviewCount(int studentId) {
+        String sql = "SELECT COUNT(*) FROM placements WHERE student_id=? AND status='Interview'";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+				return rs.getInt(1);
+			}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    @Override
+    public void applyPlacement(int studentId, int companyId) {
+        String sql = "INSERT INTO placements(student_id, company_id, apply_date, status) VALUES (?, ?, CURDATE(), 'Applied')";
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, studentId);
+            ps.setInt(2, companyId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Override
+    public List<Placement> getAllApplications() {
+        return findAll();
+    }
+}

@@ -1,0 +1,15 @@
+package org.placepro.daoImpl;
+
+import org.placepro.model.Application;
+import org.placepro.repositoryImpl.ApplicationRepositoryImpl;
+
+public class ApplicationDaoImpl {
+
+    ApplicationRepositoryImpl repo =
+            new ApplicationRepositoryImpl();
+
+    public boolean apply(Application app){
+
+        return repo.save(app);
+    }
+}

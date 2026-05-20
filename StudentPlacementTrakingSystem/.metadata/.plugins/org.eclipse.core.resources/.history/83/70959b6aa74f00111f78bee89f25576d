@@ -1,0 +1,23 @@
+package org.placepro.daoImpl;
+
+import java.util.List;
+
+import org.placepro.dao.InterviewDao;
+import org.placepro.model.Interview;
+import org.placepro.repository.InterviewRepository;
+import org.placepro.repositoryImpl.InterviewRepositoryImpl;
+
+public class InterviewDaoImpl implements InterviewDao {
+
+    private InterviewRepository repo = new InterviewRepositoryImpl();
+
+    @Override
+    public void scheduleInterview(Interview interview) {
+        repo.scheduleInterview(interview);
+    }
+
+    @Override
+    public List<Interview> getStudentInterviews(int studentId) {
+        return repo.getStudentInterviews(studentId);
+    }
+}

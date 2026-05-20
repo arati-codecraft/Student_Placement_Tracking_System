@@ -1,0 +1,23 @@
+package org.placepro.model;
+
+import lombok.*;
+
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter
+@Setter
+public class Users
+{
+	
+	 private int id;
+	    private String name;
+	    private String email;
+	    private String mobile;
+	    private String course;
+	    private double percentage;
+	    private String skills;
+	    private String password;
+	    private String role;
+	    private String status;
+	    private String  education;
+}

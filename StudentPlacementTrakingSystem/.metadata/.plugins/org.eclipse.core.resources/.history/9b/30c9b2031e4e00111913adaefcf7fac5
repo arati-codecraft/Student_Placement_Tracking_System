@@ -1,0 +1,7 @@
+package org.placepro.dao;
+
+public interface PlacementDao
+{
+	void applyPlacement(int studentId, int companyId);
+    List<Placement> getAllApplications();
+}

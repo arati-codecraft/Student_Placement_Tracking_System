@@ -1,0 +1,16 @@
+package org.placepro.repository;
+
+import java.util.List;
+import org.placepro.model.Users;
+
+public interface StudentRepository {
+    void save(Users student);
+    void delete(int id);
+    List<Users> findAllStudents();
+    // only students, not admins
+    Users findById(int id);
+    void update(Users student);
+    void updateStatus(int id, String status);
+    List<Users> search(String course, Double percentage, String skill);
+
+}

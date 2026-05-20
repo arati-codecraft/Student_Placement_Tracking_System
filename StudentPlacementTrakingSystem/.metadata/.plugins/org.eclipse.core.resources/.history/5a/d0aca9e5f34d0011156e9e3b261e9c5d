@@ -1,0 +1,89 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    private static final long serialVersionUID = 1L;
+
+    public AdminDashboardServlet() {
+        super();
+    }
+
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // ✅ Set JSON response
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        PrintWriter out = response.getWriter();
+
+        try {
+            AdminDao dao = new AdminDaoImpl();
+
+            // 🔥 Fetch data
+            List<Placement> list = dao.getAllPlacements();
+
+            int students = dao.totalStudents();
+            int companies = dao.totalCompanies();
+            int applications = dao.totalApplications();
+            int selected = dao.totalSelected();
+
+            // 🔥 Build JSON
+            StringBuilder json = new StringBuilder();
+
+            json.append("{");
+            json.append("\"students\":").append(students).append(",");
+            json.append("\"companies\":").append(companies).append(",");
+            json.append("\"applications\":").append(applications).append(",");
+            json.append("\"selected\":").append(selected).append(",");
+            json.append("\"data\":[");
+
+            for (int i = 0; i < list.size(); i++) {
+
+                Placement p = list.get(i);
+
+                json.append("{");
+                json.append("\"id\":").append(p.getId()).append(",");
+                json.append("\"name\":\"").append(p.getStudentName()).append("\",");
+                json.append("\"company\":\"").append(p.getCompanyName()).append("\",");
+                json.append("\"package\":\"").append(p.getPackageName()).append("\",");
+                json.append("\"status\":\"").append(p.getStatus()).append("\"");
+                json.append("}");
+
+                if (i < list.size() - 1) {
+                    json.append(",");
+                }
+            }
+
+            json.append("]}");
+
+            out.print(json.toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            out.print("{\"error\":\"Server Error\"}");
+        }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // Optional: redirect POST to GET
+        doGet(request, response);
+    }
+}

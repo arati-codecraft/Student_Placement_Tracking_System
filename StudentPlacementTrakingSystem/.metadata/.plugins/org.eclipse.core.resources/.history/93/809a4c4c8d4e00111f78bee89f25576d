@@ -1,0 +1,39 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/deleteCompany")
+public class DeleteCompanyServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idParam = req.getParameter("id");
+        if (idParam != null) {
+            try {
+                int id = Integer.parseInt(idParam);
+                companyDao.deleteCompany(id);
+            } catch (NumberFormatException e) {
+                e.printStackTrace(); // or log properly
+            }
+        }
+        // Redirect back to company management page
+        resp.sendRedirect(req.getContextPath() + "/managecompany");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws ServletException, IOException {
+        doGet(req, resp);
+    }
+}

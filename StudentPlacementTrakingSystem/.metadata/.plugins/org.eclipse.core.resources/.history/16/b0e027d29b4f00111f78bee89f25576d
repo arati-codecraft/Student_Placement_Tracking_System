@@ -1,0 +1,27 @@
+package org.placepro.daoImpl;
+
+import java.util.List;
+import org.placepro.dao.PlacementDao;
+import org.placepro.model.Placement;
+import org.placepro.repository.PlacementRepository;
+import org.placepro.repositoryImpl.PlacementRepositoryImpl;
+
+public class PlacementDaoImpl implements PlacementDao {
+    private PlacementRepository repo = new PlacementRepositoryImpl();
+
+    @Override
+    public void applyPlacement(int studentId, int companyId, double packageAmount) {
+        repo.save(studentId, companyId, packageAmount);
+    }
+
+    @Override
+    public List<Placement> getAllApplications() {
+        return repo.findAll();
+    }
+    
+    @Override
+    public void updateStatus(int id, String status) {
+        repo.updateStatus(id, status);
+    }
+    
+}

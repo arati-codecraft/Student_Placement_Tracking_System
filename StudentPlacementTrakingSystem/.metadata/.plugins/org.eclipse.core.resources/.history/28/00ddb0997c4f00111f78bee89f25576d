@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Student Dashboard</title>
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+<style>
+body{font-family:Arial;background:#f1f5f9;margin:0;}
+.sidebar{width:220px;height:100vh;position:fixed;background:#6d28d9;color:white;padding:20px;}
+.sidebar a{display:block;color:white;text-decoration:none;margin:15px 0;}
+.main{margin-left:240px;padding:30px;}
+.cards{display:flex;gap:20px;}
+.card{background:white;padding:20px;border-radius:10px;width:200px;text-align:center;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+</style>
+
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+    <h2>PlacePro</h2>
+    <a href="#">Dashboard</a>
+    <a href="#">Profile</a>
+    <a href="#">Applications</a>
+    <a href="#">Interviews</a>
+    <a href="logout">Logout</a>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+
+    <h1>Welcome Student 👋</h1>
+
+    <!-- CARDS -->
+    <div class="cards">
+
+        <div class="card">
+            <i class="fa-solid fa-building"></i>
+            <h3>Total Companies</h3>
+            <h1 id="companyCount">0</h1>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-paper-plane"></i>
+            <h3>Applied</h3>
+            <h1 id="appliedCount">0</h1>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-circle-check"></i>
+            <h3>Selected</h3>
+            <h1 id="selectedCount">0</h1>
+        </div>
+
+        <div class="card">
+            <i class="fa-solid fa-calendar-check"></i>
+            <h3>Interviews</h3>
+            <h1 id="interviewCount">0</h1>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- SCRIPT -->
+<script>
+
+// 🔥 FETCH DATA FROM SERVLET
+async function loadDashboard() {
+    try {
+        const res = await fetch("studentDashboard");
+        const data = await res.json();
+
+        document.getElementById("companyCount").innerText = data.companies;
+        document.getElementById("appliedCount").innerText = data.applied;
+        document.getElementById("selectedCount").innerText = data.selected;
+        document.getElementById("interviewCount").innerText = data.interviews;
+
+    } catch (error) {
+        console.error("Error:", error);
+    }
+}
+
+// CALL ON LOAD
+loadDashboard();
+
+</script>
+
+</body>
+</html>

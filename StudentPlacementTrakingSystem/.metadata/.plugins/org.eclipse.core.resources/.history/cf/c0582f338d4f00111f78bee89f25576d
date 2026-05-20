@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlacePro Dashboard</title>
+    <!-- Font Awesome for the specific icons seen in the screenshot -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-purple: #7d3cff;
+            --light-purple: #a269ff;
+            --bg-gray: #f4f7fe;
+            --white: #ffffff;
+            --text-dark: #333333;
+            --text-gray: #888888;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-gray);
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* --- Sidebar Styles --- */
+        .sidebar {
+            width: 240px;
+            background-color: var(--primary-purple);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            padding: 40px 20px;
+            flex-shrink: 0;
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .logo-box {
+            background: rgba(255, 255, 255, 0.2);
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .nav-links {
+            flex-grow: 1;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: white;
+            text-decoration: none;
+            margin-bottom: 8px;
+            border-radius: 10px;
+            transition: 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-item i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+        }
+
+        .nav-item.active {
+            background-color: white;
+            color: var(--primary-purple);
+        }
+
+        .logout-btn {
+            background: white;
+            color: var(--primary-purple);
+            border: none;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* --- Main Content Area --- */
+        .main-content {
+            flex-grow: 1;
+            padding: 30px 40px;
+            overflow-y: auto;
+        }
+
+        /* Header / Search */
+        .top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-bar {
+            background: white;
+            padding: 10px 25px;
+            border-radius: 25px;
+            width: 350px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .search-bar input {
+            border: none;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        .user-badge {
+            background: white;
+            padding: 5px 15px 5px 5px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            background: var(--primary-purple);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-text {
+            line-height: 1.2;
+        }
+
+        .user-name {
+            display: block;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .user-sub {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* Banner */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--primary-purple), #b185ff);
+            border-radius: 30px;
+            padding: 40px 50px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .welcome-card h3 {
+            font-weight: normal;
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .welcome-card h2 {
+            font-size: 42px;
+            margin: 10px 0;
+        }
+
+        .welcome-card p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+
+        .student-illustration {
+            height: 180px;
+            /* In a real project, you'd use the image from Screenshot 2026-05-14 154327.png here */
+        }
+
+        /* Stats Grid */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 30px 20px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            transition: transform 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 30px;
+            color: var(--primary-purple);
+            margin-bottom: 15px;
+        }
+
+        .stat-value {
+            display: block;
+            font-size: 36px;
+            font-weight: bold;
+            color: var(--text-dark);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: var(--text-gray);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+
+<body>
+
+<!-- SIDEBAR (UNCHANGED) -->
+<aside class="sidebar">
+
+    <div class="logo-container">
+        <div class="logo-box">
+            <i class="fas fa-graduation-cap"></i>
+        </div>
+        <div class="logo-text">PlacePro</div>
+    </div>
+
+<nav class="nav-links">
+
+    <a href="StudentDash.html" class="nav-item active">
+        <i class="fas fa-th-large"></i> Dashboard
+    </a>
+
+    <a href="/StudentPlaceTrackingSytem/updateProfile" class="nav-item">
+        <i class="fas fa-user"></i> Profile
+    </a>
+
+    <a href="StudentPlaceTrackingSystem/scheduleInterview" class="nav-item">
+        <i class="fas fa-calendar-alt"></i> Interviews
+    </a>
+
+    <a href="/StudentPlaceTrackingSystem/placementTracker" class="nav-item">
+        <i class="fas fa-file-alt"></i> Applications
+    </a>
+
+    <a href="/StudentPlaceTrackingSystem/applyPlacement" class="nav-item">
+        <i class="fas fa-paper-plane"></i> Apply
+    </a>
+
+    <a href="/StudentPlaceTrackingSystem/coordinators" class="nav-item">
+        <i class="fas fa-users"></i> Coordinators
+    </a>
+
+</nav>
+
+    <button class="logout-btn">
+        <i class="fas fa-sign-out-alt"></i> Logout
+    </button>
+
+</aside>
+
+<!-- MAIN -->
+<main class="main-content">
+
+    <header class="top-nav">
+        <div class="search-bar">
+            <input type="text" placeholder="Search">
+        </div>
+
+        <div class="user-badge">
+            <div class="avatar-circle">S</div>
+            <div class="user-text">
+                <span class="user-name">Student</span>
+                <span class="user-sub">Student</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- BANNER -->
+    <section class="welcome-card">
+        <div>
+            <h3>Student Dashboard</h3>
+            <h2>Welcome Student 👋</h2>
+            <p>Manage your placements and applications</p>
+        </div>
+
+        <i class="fas fa-user-graduate" style="font-size:150px;opacity:0.8;"></i>
+    </section>
+
+    <!-- STATS (NOW CONNECTED TO SERVLET) -->
+    <section class="stats-container">
+
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-building"></i></div>
+            <span class="stat-value" id="companiesCount">0</span>
+            <span class="stat-label">Total Companies</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-paper-plane"></i></div>
+            <span class="stat-value" id="appliedCount">0</span>
+            <span class="stat-label">Applications</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+            <span class="stat-value" id="selectedCount">0</span>
+            <span class="stat-label">Selected</span>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon"><i class="fas fa-calendar-check"></i></div>
+            <span class="stat-value" id="interviewCount">0</span>
+            <span class="stat-label">Interviews</span>
+        </div>
+
+    </section>
+
+</main>
+
+<!-- ================= JS CONNECT TO SERVLET ================= -->
+<script>
+async function loadDashboard() {
+
+    try {
+        const response = await fetch("/StudentPlaceTrackingSytem/studentDashboard");
+        const data = await response.json();
+
+        if (data.error) {
+            alert(data.error);
+            return;
+        }
+
+        document.getElementById("companiesCount").innerText = data.companies;
+        document.getElementById("appliedCount").innerText = data.applied;
+        document.getElementById("selectedCount").innerText = data.selected;
+        document.getElementById("interviewCount").innerText = data.interviews;
+
+    } catch (error) {
+        console.error("Error loading dashboard:", error);
+    }
+}
+
+loadDashboard();
+</script>
+
+</body>
+</html>

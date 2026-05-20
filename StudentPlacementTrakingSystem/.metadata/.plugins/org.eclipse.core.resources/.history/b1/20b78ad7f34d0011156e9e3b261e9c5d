@@ -1,0 +1,39 @@
+package org.placepro.daoImpl;
+
+
+
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.model.Placement;
+import org.placepro.repository.PlacementRepository;
+import org.placepro.repositoryImpl.PlacementRepositoryImpl;
+
+public class AdminDaoImpl implements AdminDao {
+
+    PlacementRepository repo = new PlacementRepositoryImpl();
+
+    public List<Placement> getAllPlacements() {
+        return repo.findAllPlacements();
+    }
+
+    public int totalStudents() {
+        return repo.countStudents();
+    }
+
+    public int totalCompanies() {
+        return repo.countCompanies();
+    }
+
+    public int totalApplications() {
+        return repo.countApplications();
+    }
+
+    public int totalSelected() {
+        return repo.countSelected();
+    }
+
+    public void updateStatus(int id, String status) {
+        repo.updatePlacementStatus(id, status);
+    }
+}

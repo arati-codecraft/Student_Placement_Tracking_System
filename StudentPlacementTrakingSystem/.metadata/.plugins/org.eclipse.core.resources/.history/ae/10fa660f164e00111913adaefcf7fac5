@@ -1,0 +1,59 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Company;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/addcompany")
+public class AddCompanyServlet extends HttpServlet {
+
+    @Override
+    protected void doPost(HttpServletRequest request,
+                          HttpServletResponse response)
+            throws ServletException, IOException {
+
+        String companyName =
+        request.getParameter("companyName");
+
+        String companyPackage =
+        request.getParameter("companyPackage");
+
+        String location =
+        request.getParameter("location");
+
+        String criteria =
+        request.getParameter("criteria");
+
+        Company company = new Company(
+                companyName,
+                companyPackage,
+                location,
+                criteria
+        );
+
+        CompanyDao dao = new CompanyDaoImpl();
+
+        boolean status = dao.addCompany(company);
+
+        if(status) {
+
+            response.sendRedirect(
+            "Admin/AdminDashboard.html?msg=success");
+
+        }
+        else {
+
+            response.sendRedirect(
+            "Admin/AdminDashboard.html?msg=failed");
+
+        }
+    }
+}

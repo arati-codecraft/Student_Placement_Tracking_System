@@ -1,0 +1,12 @@
+package org.placepro.dao;
+
+import java.util.List;
+
+import org.placepro.model.Users;
+
+public interface UsersLoginDao {
+    boolean registerUser(Users user);
+    Users loginUser(String email, String password);
+    List<Users> getAllUsers();
+    void removeUser(int id);
+}

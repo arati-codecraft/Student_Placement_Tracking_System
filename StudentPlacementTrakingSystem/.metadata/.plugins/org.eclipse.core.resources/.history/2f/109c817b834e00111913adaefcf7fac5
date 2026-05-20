@@ -1,0 +1,87 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+import org.placepro.model.Company;
+
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@WebServlet("/managecompany")
+public class ManageCompanyServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        // ✅ Handle delete via query parameter
+        String deleteId = req.getParameter("deleteId");
+        if (deleteId != null) {
+            int id = Integer.parseInt(deleteId);
+            companyDao.deleteCompany(id);
+            resp.sendRedirect(req.getContextPath() + "/managecompany");
+            return;
+        }
+
+        List<Company> companies = companyDao.getAllCompanies();
+
+        out.println("<!DOCTYPE html>");
+        out.println("<html><head><title>Manage Companies</title>");
+        out.println("<link href='https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css' rel='stylesheet'>");
+        out.println("</head><body>");
+
+        out.println("<div class='container mt-4'>");
+        out.println("<h2>Manage Companies</h2>");
+
+        // Add form
+        out.println("<form method='post'>");
+        out.println("Name: <input type='text' name='name' required>");
+        out.println("Email: <input type='email' name='email' required>");
+        out.println("Contact: <input type='text' name='contact' required>");
+        out.println("<button type='submit' class='btn btn-primary'>Add Company</button>");
+        out.println("</form><hr>");
+
+        // Company table
+        out.println("<table class='table table-bordered'>");
+        out.println("<thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Contact</th><th>Action</th></tr></thead>");
+        out.println("<tbody>");
+        for (Company c : companies) {
+            out.println("<tr>");
+            out.println("<td>" + c.getId() + "</td>");
+            out.println("<td>" + c.getName() + "</td>");
+            out.println("<td>" + c.getEmail() + "</td>");
+            out.println("<td>" + c.getContact() + "</td>");
+            out.println("<td><a href='managecompany?deleteId=" + c.getId() + "' class='btn btn-danger btn-sm'>Delete</a></td>");
+            out.println("</tr>");
+        }
+        out.println("</tbody></table>");
+        out.println("</div></body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String name = req.getParameter("name");
+        String email = req.getParameter("email");
+        String contact = req.getParameter("contact");
+
+        Company company = new Company();
+        company.setName(name);
+        company.setEmail(email);
+        company.setContact(contact);
+
+        // ✅ Use DAO
+        companyDao.addCompany(company);
+
+        // Redirect back to same page
+        resp.sendRedirect(req.getContextPath() + "/managecompany");
+    }
+}

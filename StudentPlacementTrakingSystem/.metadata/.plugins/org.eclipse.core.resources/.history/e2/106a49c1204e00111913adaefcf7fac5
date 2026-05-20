@@ -1,0 +1,38 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+
+import org.placepro.dao.CompanyDao;
+import org.placepro.daoImpl.CompanyDaoImpl;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServlet;
+
+
+
+/**
+ * Servlet implementation class DeleteCompanyServlet
+ */
+WebServlet("/deleteCompany")
+public class DeleteCompanyServlet extends HttpServlet {
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        String idParam = req.getParameter("id");
+        if (idParam != null) {
+            int id = Integer.parseInt(idParam);
+            companyDao.deleteCompany(id);
+        }
+        resp.sendRedirect("manageCompany");
+    }
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

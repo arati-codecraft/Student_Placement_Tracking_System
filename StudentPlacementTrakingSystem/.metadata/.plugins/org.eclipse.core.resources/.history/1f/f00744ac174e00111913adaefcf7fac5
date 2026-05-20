@@ -1,0 +1,7 @@
+package org.placepro.dao;
+import java.util.*;
+public interface StudentDao {
+	void addStudent(Student student);
+    List<Student> getAllStudents();
+    void updatePlacementStatus(int studentId, String status);
+}

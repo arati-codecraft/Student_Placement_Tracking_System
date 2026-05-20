@@ -1,0 +1,53 @@
+package org.placepro.controller;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+/**
+ * Servlet implementation class ProfileEditServlet
+ */
+@WebServlet("/updateProfile")
+public class ProfileEditServlet extends HttpServlet {
+
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp)
+            throws IOException {
+
+        try {
+            Connection con = DBConnection.getConnection();
+
+            int id = (int) req.getSession().getAttribute("userId");
+
+            PreparedStatement ps = con.prepareStatement(
+                "UPDATE users SET name=?, mobile=?, course=?, percentage=?, skills=? WHERE id=?"
+            );
+
+            ps.setString(1, req.getParameter("name"));
+            ps.setString(2, req.getParameter("mobile"));
+            ps.setString(3, req.getParameter("course"));
+            ps.setDouble(4, Double.parseDouble(req.getParameter("percentage")));
+            ps.setString(5, req.getParameter("skills"));
+            ps.setInt(6, id);
+
+            ps.executeUpdate();
+
+            resp.sendRedirect("studentdashboard");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}

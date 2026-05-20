@@ -1,0 +1,5 @@
+package org.placepro.model;
+
+public class Company {
+
+}

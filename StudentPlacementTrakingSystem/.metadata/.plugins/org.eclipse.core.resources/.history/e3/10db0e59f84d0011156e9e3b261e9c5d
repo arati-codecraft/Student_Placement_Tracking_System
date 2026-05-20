@@ -1,0 +1,45 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.dao.AdminDao;
+import org.placepro.daoImpl.AdminDaoImpl;
+import org.placepro.model.Placement;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.*;
+
+@WebServlet("/admindashboard")
+public class AdminDashboardServlet extends HttpServlet {
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws IOException {
+
+        response.setContentType("application/json");
+
+        AdminDao dao = new AdminDaoImpl();
+
+        String json =
+        "{"
+        + "\"students\":" + dao.totalStudents() + ","
+        + "\"companies\":" + dao.totalCompanies() + ","
+        + "\"applications\":" + dao.totalApplications() + ","
+        + "\"selected\":" + dao.totalSelected() + ","
+        + "\"data\":" + new com.google.gson.Gson().toJson(dao.getAllPlacements())
+        + "}";
+
+        response.getWriter().write(json);
+    }
+}
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
+        // Optional: redirect POST to GET
+        doGet(request, response);
+    }
+}

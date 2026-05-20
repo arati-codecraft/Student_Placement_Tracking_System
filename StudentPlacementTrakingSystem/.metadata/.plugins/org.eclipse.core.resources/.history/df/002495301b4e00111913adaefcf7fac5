@@ -1,0 +1,47 @@
+package org.placepro.controller;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.List;
+
+import org.placepro.model.Company;
+
+import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+/**
+ * Servlet implementation class ManageCompanyServlet
+ */
+@WebServlet("/manageCompany")
+public class ManageCompanyServlet extends HttpServlet {
+    private CompanyDao companyDao = new CompanyDaoImpl();
+
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        resp.setContentType("text/html");
+        PrintWriter out = resp.getWriter();
+
+        List<Company> companies = companyDao.getAllCompanies();
+
+        out.println("<html><body><h2>Manage Companies</h2>");
+        out.println("<table border='1'><tr><th>ID</th><th>Name</th><th>Action</th></tr>");
+        for (Company c : companies) {
+            out.println("<tr><td>"+c.getId()+"</td><td>"+c.getName()+"</td>"
+                + "<td><a href='deleteCompany?id="+c.getId()+"'>Delete</a></td></tr>");
+        }
+        out.println("</table></body></html>");
+    }
+}
+
+	/**
+	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
+	 */
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		// TODO Auto-generated method stub
+		doGet(request, response);
+	}
+
+}
